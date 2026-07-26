@@ -1,8 +1,8 @@
 # Careful
 
-An evidence-led Codex plugin for exploration, implementation, review, documentation, and learning.
+An evidence-led, multi-harness workflow for exploration, implementation, review, documentation, and learning.
 
-After installation and project adoption, the plugin applies a default Standard workflow automatically. It escalates to Deep work for risky, product, architecture, public-contract, data, security, privacy, reliability, and hard-to-reverse changes. Explicit controls exist, but ordinary requests should not need them.
+After installation and project adoption, Careful applies a default Standard workflow automatically where the host supports automatic activation. It escalates to Deep work for risky, product, architecture, public-contract, data, security, privacy, reliability, and hard-to-reverse changes. Explicit controls exist, but ordinary requests should not need them.
 
 ## What it does
 
@@ -14,13 +14,15 @@ After installation and project adoption, the plugin applies a default Standard w
 
 ## Structure
 
-- `plugins/careful/` — Codex plugin and skills.
+- `core/` — canonical portable workflow policy and adapter manifest.
+- `plugins/careful/` — Codex adapter and compatibility package.
+- `adapters/` — Claude Code and Factory Droid adapter layouts.
 - `examples/` — portable project-profile and OpenSpec schema examples.
 - `docs/` — design notes for the harness itself.
 
 ## Status
 
-This is an initial Codex-only implementation. It intentionally excludes workplace governance, non-Codex adapters, and automatic mutation of user projects.
+Codex is the verified static adapter. Claude Code and Factory Droid adapters are experimental until their authenticated fresh-session fixtures are recorded. Careful intentionally excludes workplace governance, hosted control planes, centralized telemetry, and automatic mutation of user projects.
 
 ## Contributing
 
@@ -32,7 +34,7 @@ Contributions are welcome through GitHub pull requests. The `main` branch is pro
 
 ## Try it locally
 
-Clone this repository, add it as a local marketplace, then install the plugin:
+For Codex, clone this repository, add it as a local marketplace, then install the plugin:
 
 ```bash
 git clone https://github.com/<OWNER>/careful.git
@@ -44,5 +46,7 @@ codex plugin add careful@careful
 Replace `<OWNER>` with the GitHub account or organization that publishes Careful.
 
 Start a new Codex thread after installation. The workflow skill should activate for substantive product and coding work; use `$careful-adopt` when onboarding a project and `$careful-retrospective` for an explicit learning pass.
+
+For Claude Code and Factory Droid, follow the adapter-specific paths in [docs/adoption.md](docs/adoption.md). Read [docs/compatibility.md](docs/compatibility.md) before relying on an adapter control.
 
 To use the Deep OpenSpec workflow in a project, copy `examples/openspec-schemas/critical-deep` into that project's `openspec/schemas/` directory and set `schema: critical-deep` in `openspec/config.yaml`.

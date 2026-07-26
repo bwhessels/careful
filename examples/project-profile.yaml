@@ -21,3 +21,10 @@ documentation:
   decisions: docs/architecture/decisions/
   development: docs/development/
   reference: docs/reference/
+
+careful:
+  adapters:
+    - codex
+    - claude-code
+    - factory-droid
+  private_context: .careful/
