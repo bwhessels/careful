@@ -4,6 +4,8 @@ careful.local.yaml
 
 # Local Codex preferences; keep shareable project configuration outside these paths.
 .codex/*.local.*
+# Generated project-local skill wrappers (for example, OpenSpec's Codex helpers).
+.codex/skills/
 
 # Secrets and local credentials. Keep safe examples explicitly versioned.
 .env

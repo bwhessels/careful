@@ -17,9 +17,11 @@ Thanks for considering a contribution. Careful is intentionally small and opinio
 
 5. Open a pull request using the template and describe the motivation, trade-offs, validation, and any documentation impact.
 
+OpenSpec's generated `.codex/skills/` wrappers are local development convenience files and are intentionally ignored. The tracked `openspec/` artifacts and the OpenSpec CLI are the contributor-facing source of truth.
+
 ## Review and merging
 
-Pull requests are welcome, but only a project maintainer can merge them. The `main` branch requires an approving review from the code owner. Please keep PRs focused so they can be evaluated carefully.
+Pull requests are welcome, but only project writers can merge them. Public contributors should use forks and pull requests; `main` remains protected and pull-request-only. Please keep PRs focused so they can be evaluated carefully.
 
 ## Design changes
 
