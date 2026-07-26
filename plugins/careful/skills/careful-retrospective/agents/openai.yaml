@@ -1,0 +1,6 @@
+interface:
+  display_name: "Careful Retrospective"
+  short_description: "Learn from completed work"
+  default_prompt: "Use $careful-retrospective to learn from this completed change."
+policy:
+  allow_implicit_invocation: true

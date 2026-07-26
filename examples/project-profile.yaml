@@ -1,0 +1,23 @@
+version: 1
+project:
+  name: example-service
+  maturity: adopted
+
+commands:
+  test: npm test
+  lint: npm run lint
+  typecheck: npm run typecheck
+
+risk_boundaries:
+  - public_api
+  - database_migration
+  - authentication
+
+documentation:
+  readme: README.md
+  specs: openspec/specs/
+  changes: openspec/changes/
+  architecture: docs/architecture/
+  decisions: docs/architecture/decisions/
+  development: docs/development/
+  reference: docs/reference/

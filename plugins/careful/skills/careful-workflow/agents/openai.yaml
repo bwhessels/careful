@@ -1,0 +1,6 @@
+interface:
+  display_name: "Careful Workflow"
+  short_description: "Run critical development workflows"
+  default_prompt: "Use $careful-workflow to handle this request with Careful."
+policy:
+  allow_implicit_invocation: true

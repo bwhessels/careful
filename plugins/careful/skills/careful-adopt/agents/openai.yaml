@@ -1,0 +1,6 @@
+interface:
+  display_name: "Careful Adopt"
+  short_description: "Adopt a project into the harness"
+  default_prompt: "Use $careful-adopt to set up this project for Careful."
+policy:
+  allow_implicit_invocation: true

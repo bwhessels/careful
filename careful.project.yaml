@@ -1,0 +1,28 @@
+version: 1
+project:
+  name: careful
+  maturity: self-hosting
+
+commands:
+  validate_self_hosting: python3 scripts/validate_self_hosting.py
+  validate_specs: openspec validate --specs
+
+risk_boundaries:
+  - plugin_contract
+  - workflow_schema
+  - evidence_policy
+  - documentation_model
+
+documentation:
+  readme: README.md
+  specs: openspec/specs/
+  changes: openspec/changes/
+  architecture: docs/design.md
+  development: AGENTS.md
+
+self_hosting:
+  distributable_plugin: plugins/careful/
+  private_context: .careful/
+  fixture_projects:
+    - fixtures/adopted-project/
+  require_fresh_thread_after_plugin_update: true

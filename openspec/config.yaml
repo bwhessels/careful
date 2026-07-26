@@ -1,0 +1,20 @@
+schema: spec-driven
+
+context: |
+  Project: Careful, a shareable Codex-first coding-agent harness.
+  Distributable plugin: plugins/careful/.
+  Public sources of truth: openspec/, docs/, examples/, and plugin source.
+  Private maintainer context: .careful/; do not read or modify it unless the user explicitly asks.
+  Core behavior: evidence-led claims, proportional Quick/Standard/Deep work,
+  evidence-backed blocks with user overrides, automatic documentation impact,
+  independent Deep review, and user-approved retrospective learning.
+
+rules:
+  proposal:
+    - State public behavior impact and explicit non-goals.
+    - Identify whether the change affects the distributable plugin, a schema, or fixtures.
+  design:
+    - Preserve the boundary between public project artifacts and ignored local context.
+  tasks:
+    - Include plugin and skill validation for distributable behavior changes.
+    - Include fixture-project validation when a workflow contract changes.

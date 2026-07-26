@@ -1,0 +1,20 @@
+{
+  "name": "careful",
+  "interface": {
+    "displayName": "Careful"
+  },
+  "plugins": [
+    {
+      "name": "careful",
+      "source": {
+        "source": "local",
+        "path": "./plugins/careful"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

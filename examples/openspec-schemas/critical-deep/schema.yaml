@@ -1,0 +1,71 @@
+name: critical-deep
+version: 1
+description: Evidence-led workflow for risky, architectural, and product changes.
+
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Problem framing and intended behavior change.
+    template: proposal.md
+    instruction: |
+      Explain the problem, intended outcome, non-goals, and affected behavior.
+      Mark unsupported claims as assumptions or unknowns.
+    requires: []
+
+  - id: research
+    generates: research.md
+    description: Evidence and uncertainty record.
+    template: research.md
+    instruction: |
+      Record relevant repository evidence and external sources. Label claims as
+      verified, inferred, assumption, or unknown.
+    requires: [proposal]
+
+  - id: adversarial-review
+    generates: adversarial-review.md
+    description: Pre-implementation critical review.
+    template: adversarial-review.md
+    instruction: |
+      Challenge the recommended direction. Identify material risks, alternatives,
+      invalidated assumptions, and any blocking evidence.
+    requires: [proposal, research]
+
+  - id: design
+    generates: design.md
+    description: Implementation design and decision record.
+    template: design.md
+    instruction: |
+      Explain the recommended design, boundaries, consequences, and reversibility.
+      Link to the adversarial review rather than repeating its analysis.
+    requires: [proposal, adversarial-review]
+
+  - id: tasks
+    generates: tasks.md
+    description: Verifiable implementation plan.
+    template: tasks.md
+    instruction: |
+      Break the accepted design into testable tasks. Include documentation impact
+      and verification work.
+    requires: [design]
+
+  - id: implementation-evidence
+    generates: implementation-evidence.md
+    description: Verification and review evidence.
+    template: implementation-evidence.md
+    instruction: |
+      Record implementation evidence, documentation impact, independent review,
+      residual risks, and accepted overrides.
+    requires: [tasks]
+
+  - id: retrospective
+    generates: retrospective.md
+    description: Candidate lessons after completion.
+    template: retrospective.md
+    instruction: |
+      Identify evidence-backed learning candidates. Do not change project or
+      harness policy without explicit user approval.
+    requires: [implementation-evidence]
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md

@@ -1,0 +1,21 @@
+# Local Careful context and event records may contain product, user, or conversation details.
+.careful/
+careful.local.yaml
+
+# Local Codex preferences; keep shareable project configuration outside these paths.
+.codex/*.local.*
+
+# Secrets and local credentials. Keep safe examples explicitly versioned.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Local development by-products.
+.DS_Store
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
