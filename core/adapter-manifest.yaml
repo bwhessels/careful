@@ -1,0 +1,36 @@
+version: 1
+core_policy: core/policy.md
+supported_adapters:
+  codex:
+    status: verified-fixture
+    distribution: plugins/careful/
+    project_guidance: AGENTS.md
+    explicit_controls: [quick, deep, review, retro, adopt, override]
+    automatic_activation: careful-workflow skill
+    independent_review: Codex independent reviewer in Deep mode
+    validation:
+      - python3 scripts/validate_self_hosting.py
+      - python3 <path-to-plugin-creator>/validate_plugin.py plugins/careful
+    fixture: fixtures/adopted-project/codex
+  claude-code:
+    status: experimental-static
+    distribution: adapters/claude-code/
+    project_guidance: CLAUDE.md importing AGENTS.md
+    explicit_controls: [careful-workflow, careful-documentation, careful-retrospective, careful-adopt]
+    automatic_activation: Claude skill discovery; fresh-session verification required
+    independent_review: careful-independent-review subagent
+    validation:
+      - python3 scripts/validate_self_hosting.py
+    fixture: fixtures/adopted-project/claude-code
+    version_assumption: documented project CLAUDE.md, project skills, and custom subagents as checked 2026-07-26; no CLI binary version is pinned
+  factory-droid:
+    status: experimental-static
+    distribution: adapters/factory-droid/
+    project_guidance: AGENTS.md
+    explicit_controls: [careful-workflow, careful-documentation, careful-retrospective, careful-adopt]
+    automatic_activation: Factory project-skill discovery; fresh-session verification required
+    independent_review: careful-independent-review custom droid
+    validation:
+      - python3 scripts/validate_self_hosting.py
+    fixture: fixtures/adopted-project/factory-droid
+    version_assumption: documented AGENTS.md, project skills, and custom droids as checked 2026-07-26; no CLI binary version is pinned

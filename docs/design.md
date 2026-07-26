@@ -8,6 +8,8 @@
 | Durable requirements, deltas, designs, and history | OpenSpec |
 | Execution discipline, testing, debugging, and review | Careful skills / Codex agents |
 | Deterministic checks | Project tooling and CI |
+| Portable policy | `core/policy.md` |
+| Host discovery and permissions | Adapter-specific files in `plugins/careful/` and `adapters/` |
 
 ## Default flow
 
@@ -25,4 +27,8 @@ The default workflow is automatic. `/careful:quick`, `/careful:deep`, `/careful:
 
 ## Self-hosting
 
-Careful uses `careful.project.yaml` when working on itself. The profile identifies the distributable plugin, fixture projects, risk boundaries, public documentation, and portable validation commands. `.careful/` is local maintainer context and is intentionally excluded from the public workflow.
+Careful uses `careful.project.yaml` when working on itself. The profile identifies distributable adapters, fixture variants, risk boundaries, public documentation, and portable validation commands. `.careful/` is local maintainer context and is intentionally excluded from the public workflow.
+
+## Multi-harness adapters
+
+The policy is canonical in `core/policy.md`; adapters map it to host discovery, controls, and review mechanisms. Capability differences are explicit in `core/adapter-manifest.yaml`. An adapter is never considered behaviorally verified solely because a Markdown layout is valid: release requires a fresh host session and its corresponding fixture evidence.

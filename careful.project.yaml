@@ -8,7 +8,7 @@ commands:
   validate_specs: openspec validate --specs
 
 risk_boundaries:
-  - plugin_contract
+  - adapter_contract
   - workflow_schema
   - evidence_policy
   - documentation_model
@@ -21,8 +21,13 @@ documentation:
   development: AGENTS.md
 
 self_hosting:
-  distributable_plugin: plugins/careful/
+  distributable_adapters:
+    - plugins/careful/
+    - adapters/claude-code/
+    - adapters/factory-droid/
   private_context: .careful/
   fixture_projects:
-    - fixtures/adopted-project/
-  require_fresh_thread_after_plugin_update: true
+    - fixtures/adopted-project/codex/
+    - fixtures/adopted-project/claude-code/
+    - fixtures/adopted-project/factory-droid/
+  require_fresh_session_after_adapter_update: true

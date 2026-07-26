@@ -1,7 +1,7 @@
 {
   "name": "careful",
-  "version": "0.1.0",
-  "description": "Evidence-led development workflows for Codex.",
+  "version": "0.2.0",
+  "description": "Careful's evidence-led Codex adapter.",
   "author": {
     "name": "Careful"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Careful",
     "shortDescription": "Critical, evidence-led coding workflows.",
-    "longDescription": "Careful automatically applies evidence checks, proportional review, documentation impact analysis, and learning retrospectives to Codex work.",
+    "longDescription": "Careful's Codex adapter applies the portable evidence, proportional review, documentation-impact, and learning workflow to Codex work.",
     "developerName": "Careful",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

@@ -1,3 +1,3 @@
 # Adopted Project Fixture
 
-This minimal tracked fixture represents an external project that has adopted Careful. It validates the public project-guidance contract without relying on Careful's own source repository.
+This tracked fixture represents external projects that have adopted Careful. Its Codex, Claude Code, and Factory Droid variants validate public project-guidance and host-adapter contracts without relying on Careful's own source repository. Use [SCENARIO.md](SCENARIO.md) for comparable fresh-session behavior evaluation.
