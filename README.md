@@ -26,6 +26,10 @@ This is an initial Codex-only implementation. It intentionally excludes workplac
 
 Contributions are welcome through GitHub pull requests. The `main` branch is protected: changes require review and approval from the project maintainer before merging. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution and validation workflow.
 
+## License
+
+[MIT](LICENSE)
+
 ## Try it locally
 
 Clone this repository, add it as a local marketplace, then install the plugin:
