@@ -393,3 +393,62 @@ Outcome: Clean closure is not reset. The non-material spelling correction does n
 
 Necessary next action: None.
 ```
+
+## Task 4: Documentation and deterministic validation
+
+### Documentation impact
+
+The contributor contract for active-change dependencies now lives in `CONTRIBUTING.md`, including the `depends_on` shape and its dedicated validator. `docs/design.md` identifies the portable policy and checklist as the canonical owners of the triggered design and clean-review rules; adapters remain routing layers. `docs/release.md` sequences deterministic validation, changed-skill and plugin validation, pressure scenarios, independent review, reinstall, and fresh-session consumer evidence without treating any one layer as a substitute for another. The adopted-project scenario now exercises a material finding, correction, and confirmation pass, including unavailable-review and override reporting.
+
+No user-facing product README change is needed: these controls govern contribution, architecture, release, and fixture verification rather than installation or ordinary end-user behavior.
+
+### Full deterministic suite
+
+All required commands ran from the repository root at revision `2147294` plus the Task 4 documentation worktree changes:
+
+```text
+$ python3 -m unittest discover -s tests -v
+Ran 10 tests in 0.239s
+OK
+
+$ python3 scripts/validate_change_dependencies.py
+Careful active change dependencies passed
+
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+
+$ openspec validate --all --strict --no-interactive
+Totals: 5 passed, 0 failed (5 items)
+
+$ python3 /Users/hessels/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/careful
+Plugin validation passed: /private/tmp/careful-task4-implementer/plugins/careful
+```
+
+`validate_self_hosting.py` includes the active-change dependency integration, portable-to-adapter parity checks, installed-package reference checks, and Deep contract assertions. Deterministic success does not claim installed behavioral verification.
+
+### Changed-skill validation
+
+The three workflow skills changed by this change were validated separately:
+
+```text
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py plugins/careful/skills/careful-workflow
+Skill is valid!
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py adapters/claude-code/.claude/skills/careful-workflow
+Skill is valid!
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py adapters/factory-droid/.factory/skills/careful-workflow
+Skill is valid!
+```
+
+Changed documentation contains two relative links, from `docs/design.md` to `core/policy.md` and `core/deep-change-checklist.md`; both targets resolve from the document directory.
+
+### Pending closure controls
+
+The following remain deliberately pending and their task checkboxes remain open:
+
+- Independent specification-compliance review of the final proposal, design, requirements, tasks, evidence, and diff.
+- Separate independent code/product-quality review of parser risks, policy duplication, fixture validity, and documentation accuracy.
+- A clean confirmation pass after any material correction arising from those reviews.
+- Plugin cachebuster/reinstall followed by behavioral verification in a new Codex task. Task 3's isolated package pressure runs verify packaged artifacts, but they do not substitute for this installation boundary.
+- Final residual-risk and retrospective recording after those closure controls complete.

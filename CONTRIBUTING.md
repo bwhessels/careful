@@ -10,6 +10,8 @@ Thanks for considering a contribution. Careful is intentionally small and opinio
 4. Run the validation commands from the repository root:
 
    ```bash
+   python3 -m unittest discover -s tests -v
+   python3 scripts/validate_change_dependencies.py
    python3 scripts/validate_self_hosting.py
    python3 /path/to/plugin-creator/scripts/validate_plugin.py plugins/careful
    openspec validate --all --strict --no-interactive
@@ -18,6 +20,15 @@ Thanks for considering a contribution. Careful is intentionally small and opinio
 5. Open a pull request using the template and describe the motivation, trade-offs, validation, and any documentation impact.
 
 OpenSpec's generated `.codex/skills/` wrappers are local development convenience files and are intentionally ignored. The tracked `openspec/` artifacts and the OpenSpec CLI are the contributor-facing source of truth.
+
+An active change that builds on another active change declares its direct predecessor in the change's `.openspec.yaml`:
+
+```yaml
+depends_on:
+  - predecessor-change-name
+```
+
+Use this when the later change modifies a capability that is not yet current and the predecessor adds it. `scripts/validate_change_dependencies.py` checks required declarations, unknown or self dependencies, and cycles; it complements rather than replaces strict OpenSpec validation.
 
 ## Review and merging
 
