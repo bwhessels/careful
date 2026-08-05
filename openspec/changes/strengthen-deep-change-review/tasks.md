@@ -20,6 +20,6 @@
 
 - [x] 4.1 Update design, contributor, validation, and fixture documentation at their canonical locations.
 - [x] 4.2 Validate every changed skill with the skill-creator validator and the Codex plugin with the plugin-creator validator.
-- [ ] 4.3 Run unit, self-hosting, strict OpenSpec, adapter parity, and affected fresh-session fixture checks.
-- [ ] 4.4 Obtain independent spec-compliance and code/product-quality reviews, correct material findings, and obtain one clean confirmation pass.
-- [ ] 4.5 Record implementation evidence, documentation impact, residual risk, and retrospective outcome before archival.
+- [x] 4.3 Run unit, self-hosting, strict OpenSpec, adapter parity, and affected fresh-session fixture checks.
+- [x] 4.4 Obtain independent spec-compliance and code/product-quality reviews, correct material findings, and obtain one clean confirmation pass.
+- [x] 4.5 Record implementation evidence, documentation impact, residual risk, and retrospective outcome before archival.

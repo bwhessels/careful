@@ -443,9 +443,9 @@ Skill is valid!
 
 Changed documentation contains two relative links, from `docs/design.md` to `core/policy.md` and `core/deep-change-checklist.md`; both targets resolve from the document directory.
 
-### Pending closure controls
+### Closure controls pending at the documentation commit
 
-The following remain deliberately pending and their task checkboxes remain open:
+At the documentation commit, the following were deliberately pending and their task checkboxes remained open. The later correction-round and final-closure sections record their disposition:
 
 - Independent specification-compliance review of the final proposal, design, requirements, tasks, evidence, and diff.
 - Separate independent code/product-quality review of parser risks, policy duplication, fixture validity, and documentation accuracy.
@@ -549,3 +549,82 @@ Totals: 5 passed, 0 failed (5 items)
 ```
 
 `git diff --check` also passed. These deterministic checks do not claim a clean independent review, reinstall, or fresh-session behavioral verification.
+
+## Final closure
+
+### Independent review
+
+The final specification-compliance `confirmation3` review reported **CLEAN**, with no material actionable findings. It confirmed that the approved dependency validation, triggered Deep distribution checklist, and material-finding clean-pass behavior are implemented and evidenced.
+
+The separate final code/product-quality `confirmation3` review also reported **CLEAN**, with no material actionable findings, after three correction rounds. Those rounds corrected archive-aware dependency provenance and installed-reference validation; reconciled the canonical plan and metadata grammar while expanding adversarial parser/link coverage; then fixed Markdown fence-closure and tab-stop indentation handling. Because the final corrected artifacts received clean independent confirmation, the material-finding closure gate is satisfied.
+
+### Final source validation
+
+The final source suite ran from an isolated clone against source revision `00cc7e8`, with only this closure evidence and task-state update uncommitted:
+
+```text
+$ python3 -m unittest discover -s tests -v
+Ran 21 tests
+OK
+
+$ python3 scripts/validate_change_dependencies.py
+Careful active change dependencies passed
+
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+
+$ openspec validate --all --strict --no-interactive
+Totals: 5 passed, 0 failed (5 items)
+
+$ python3 /Users/hessels/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/careful
+Plugin validation passed: /private/tmp/careful-task4-closure/plugins/careful
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py plugins/careful/skills/careful-workflow
+Skill is valid!
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py adapters/claude-code/.claude/skills/careful-workflow
+Skill is valid!
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py adapters/factory-droid/.factory/skills/careful-workflow
+Skill is valid!
+```
+
+This verifies all 21 unit tests, active-change dependencies, self-hosting and adapter parity, all five strict OpenSpec items, all three changed workflow skills, and the source Codex plugin package.
+
+### Reinstall and installed-package verification
+
+The plugin-creator cachebuster commit is `00cc7e8` and sets the source plugin version to `0.2.0+codex.20260805161407`. Reinstall with `codex plugin add careful@careful` succeeded at:
+
+```text
+/Users/hessels/.codex/plugins/cache/careful/careful/0.2.0+codex.20260805161407
+```
+
+The installed plugin validator passed against that exact directory. Byte comparison also confirmed these installed bundle files exactly match their canonical source files:
+
+- `skills/careful-workflow/references/core-contract.md` matches `core/policy.md`.
+- `skills/careful-workflow/references/deep-change-checklist.md` matches `core/deep-change-checklist.md`.
+
+Fresh read-only Codex task `019fd2b5-7716-7002-82f4-b7b91c0a63f1` loaded these exact installed paths:
+
+```text
+/Users/hessels/.codex/plugins/cache/careful/careful/0.2.0+codex.20260805161407/skills/careful-workflow/SKILL.md
+/Users/hessels/.codex/plugins/cache/careful/careful/0.2.0+codex.20260805161407/skills/careful-workflow/references/core-contract.md
+/Users/hessels/.codex/plugins/cache/careful/careful/0.2.0+codex.20260805161407/skills/careful-workflow/references/deep-change-checklist.md
+```
+
+The task triggered the initializer checklist, enumerated all six required design fields, and stated that a corrected material Deep finding requires an independent clean pass before clean closure. It did not read the source checkout and modified no files. This supplies the required post-reinstall, fresh-task behavioral evidence.
+
+### Residual risk and deliberate non-goals
+
+- Checked-in Codex bundle parity with the canonical policy and checklist is mechanically enforced and passed. Host interpretation remains behavioral rather than formally deterministic, so the fresh-task evidence is representative rather than a proof of every possible prompt.
+- The dependency metadata reader intentionally supports a strict, documented top-level block-list grammar. Unsupported YAML variants are rejected with deterministic diagnostics; implementing a general YAML parser is a deliberate non-goal.
+- This change remains dependent on `multi-harness-adapters`. Archival and release remain gated on syncing and archiving that predecessor in the required order; this closure does not waive that sequencing constraint.
+
+### Retrospective outcome
+
+The three approved retrospective candidates are implemented and verified. The correction history surfaced two additional candidates, but neither is approved or applied by this change:
+
+1. Add canonical-plan reconciliation to the material-correction checklist, prompted by repeated drift between implementation decisions and the durable plan.
+2. Prefer table-driven adversarial matrices for parser and Markdown-link grammar tests, prompted by the repeated review rounds needed to expose boundary cases.
+
+These remain proposals for explicit user consideration. No shared policy, skill, or workflow was silently changed for them.
