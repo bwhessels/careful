@@ -34,6 +34,10 @@ Before final handoff, assess documentation impact. For a task with a block, over
 
 Deep work requires a durable change record when OpenSpec is initialized: proposal, research/evidence, adversarial review, design, tasks, implementation evidence, retrospective, then archive. It also requires an independent review of both specification compliance and code/product quality. If the active host cannot execute that review, say so explicitly, offer its documented recovery path, and do not claim the review occurred.
 
+For a Deep change affecting commands, installation, distribution, generated project guidance, or shared filesystem artifacts, complete [the Deep change checklist](deep-change-checklist.md) before implementation.
+
+After correcting a material Deep review finding, obtain an independent review of the corrected artifact. Claim clean closure only after a pass with no material actionable findings; otherwise report unavailable review, residual risk, or an accepted override.
+
 The final handoff states outcome and deliberate non-goals; evidence; material uncertainties; review and residual risk; decisions requiring the user; documentation-impact result; retrospective result; and any unavailable or degraded adapter control.
 
 ## Boundaries

@@ -54,8 +54,10 @@ def main() -> None:
     require(not dependency_errors, "\nFAIL: ".join(dependency_errors))
 
     policy = CORE / "policy.md"
+    deep_change_checklist = CORE / "deep-change-checklist.md"
     manifest_file = CORE / "adapter-manifest.yaml"
     require(policy.is_file(), "portable policy must exist")
+    require(deep_change_checklist.is_file(), "portable Deep change checklist must exist")
     require(manifest_file.is_file(), "adapter manifest must exist")
     policy_text = policy.read_text()
     require("Version: 1" in policy_text, "portable policy must be versioned")
@@ -86,6 +88,7 @@ def main() -> None:
     require("documentation map inline" in workflow, "workflow must own baseline documentation checks")
     require("retrospective signals" in workflow, "workflow must own baseline retrospective checks")
     require("careful.project.yaml" in workflow, "workflow must discover the self-hosting profile")
+    require("deep-change-checklist.md" in workflow, "Codex workflow must reference the portable Deep change checklist")
     bridge = (PLUGIN / "skills" / "careful-workflow" / "references" / "core-contract.md").read_text()
     require("core/policy.md" in bridge, "Codex bridge must reference portable policy")
 
@@ -122,6 +125,11 @@ def main() -> None:
             require(f"name: {skill}" in text, f"{name} {skill} frontmatter must match")
             require("../../../core/policy.md" in text, f"{name} {skill} must use installed-project policy path")
             require("## Evidence" not in text and "BLOCKED:" not in text, f"{name} {skill} duplicates portable policy")
+            if skill == "careful-workflow":
+                require(
+                    "../../../core/deep-change-checklist.md" in text,
+                    f"{name} workflow must reference the installed-project Deep change checklist",
+                )
         if name == "claude-code":
             require((adapter / "CLAUDE.md").is_file(), "Claude adapter must provide CLAUDE.md")
             require("@AGENTS.md" in (adapter / "CLAUDE.md").read_text(), "Claude entry point must import AGENTS.md")
@@ -134,6 +142,30 @@ def main() -> None:
         require((fixture_root / "AGENTS.md").is_file(), f"missing {fixture} fixture guidance")
         require((fixture_root / "README.md").is_file(), f"missing {fixture} fixture documentation")
     require((ROOT / "fixtures" / "adopted-project" / "SCENARIO.md").is_file(), "missing common fixture scenario")
+
+    deep_design = (ROOT / "examples" / "openspec-schemas" / "critical-deep" / "templates" / "design.md").read_text()
+    require("## Distribution contract" in deep_design, "Critical Deep design template must provide a Distribution contract")
+
+    checklist_fields = (
+        "Bootstrap and discovery:",
+        "Consumer path and reference resolution:",
+        "Cloneable source and immutable version:",
+        "Interactive, dry-run, and non-interactive defaults:",
+        "Tracked, ignored, local, and private state:",
+        "Upgrade, repair, migration, rollback, and destructive boundaries:",
+    )
+    workflow_files = [
+        PLUGIN / "skills" / "careful-workflow" / "SKILL.md",
+        ADAPTERS["claude-code"] / ".claude" / "skills" / "careful-workflow" / "SKILL.md",
+        ADAPTERS["factory-droid"] / ".factory" / "skills" / "careful-workflow" / "SKILL.md",
+    ]
+    for workflow_file in workflow_files:
+        workflow_text = workflow_file.read_text()
+        duplicated_fields = [field for field in checklist_fields if field in workflow_text]
+        require(
+            not duplicated_fields,
+            f"{workflow_file.relative_to(ROOT)} duplicates portable Deep checklist fields: {duplicated_fields}",
+        )
     print("Careful self-hosting validation passed")
 
 

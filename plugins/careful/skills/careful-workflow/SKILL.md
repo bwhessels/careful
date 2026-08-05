@@ -19,6 +19,8 @@ Treat an explicit user request for Quick or Deep as authoritative. Otherwise sel
 
 Use OpenSpec only for Deep work or when the change needs durable requirements/history. For an initialized project, use its configured schema. Otherwise offer initialization once the user accepts a durable change.
 
+For a Deep change affecting commands, installation, distribution, generated project guidance, or shared filesystem artifacts, read and complete the [portable Deep change checklist](../../../../core/deep-change-checklist.md) before implementation.
+
 ## Work loop
 
 1. Inspect the codebase and relevant evidence before recommending a path.
@@ -28,7 +30,7 @@ Use OpenSpec only for Deep work or when the change needs durable requirements/hi
 5. Honor an explicit user override. Record the rationale and accepted risk; do not represent the risk as resolved.
 6. Build incrementally; use tests, existing project commands, and focused checks as evidence.
 7. For behavior, contract, architecture, configuration, operational, or contributor-workflow changes, apply the documentation map inline: identify the canonical document, update it once, or retain evidence for a no-impact conclusion. Do not require a documentation command for this baseline check.
-8. For Deep work, obtain an independent review after implementation. Separate spec/decision compliance from code/product quality.
+8. For Deep work, obtain an independent review after implementation. Separate spec/decision compliance from code/product quality. After correcting a material finding, obtain an independent review of the corrected artifact; claim clean closure only after a pass with no material actionable findings. Otherwise report unavailable review, residual risk, or an accepted override.
 9. Before finalizing, assess retrospective signals: blocks, overrides, material review findings, failed verification, repeated rework, and durable user corrections. Report no high-signal candidate or present concise evidence-backed candidates. Do not require a retrospective command for this baseline check.
 10. Provide the final handoff in the format in `references/core-contract.md`, including documentation-impact and retrospective-assessment results when applicable.
 
