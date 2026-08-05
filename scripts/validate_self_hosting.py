@@ -58,23 +58,42 @@ def require(condition: bool, message: str) -> None:
         raise SystemExit(f"FAIL: {message}")
 
 
+def markdown_indentation_columns(line: str) -> int:
+    """Return leading indentation using four-column tab stops."""
+    columns = 0
+    for character in line:
+        if character == " ":
+            columns += 1
+        elif character == "\t":
+            columns += 4 - (columns % 4)
+        else:
+            break
+    return columns
+
+
 def markdown_link_destinations(text: str) -> set[str]:
     """Return link destinations outside Markdown code spans and fences."""
     visible_lines: list[str] = []
     fence_character: str | None = None
     fence_length = 0
     for line in text.splitlines():
+        if markdown_indentation_columns(line) >= 4:
+            continue
         fence = MARKDOWN_FENCE.match(line)
         if fence:
             marker = fence.group(1)
             if fence_character is None:
                 fence_character = marker[0]
                 fence_length = len(marker)
-            elif marker[0] == fence_character and len(marker) >= fence_length:
+            elif (
+                marker[0] == fence_character
+                and len(marker) >= fence_length
+                and not line[fence.end() :].strip(" \t")
+            ):
                 fence_character = None
                 fence_length = 0
             continue
-        if fence_character is not None or line.startswith("    ") or line.startswith("\t"):
+        if fence_character is not None:
             continue
         visible_lines.append(line)
 

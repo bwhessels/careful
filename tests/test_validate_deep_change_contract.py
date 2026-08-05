@@ -115,6 +115,83 @@ class ValidateDeepChangeContractTests(unittest.TestCase):
                     validate_installed_codex_plugin(installed_plugin),
                 )
 
+    def test_installed_plugin_does_not_close_fences_with_non_whitespace_suffixes(self):
+        original = "[portable Deep change checklist](references/deep-change-checklist.md)"
+        for marker in ("```", "~~~"):
+            with self.subTest(marker=marker):
+                temporary_directory = tempfile.TemporaryDirectory()
+                self.temporary_directories.append(temporary_directory)
+                installed_plugin = Path(temporary_directory.name) / "cache" / "careful" / "0.2.0"
+                shutil.copytree(ROOT / "plugins" / "careful", installed_plugin)
+                workflow = installed_plugin / "skills" / "careful-workflow" / "SKILL.md"
+                workflow_text = workflow.read_text()
+                replacement = (
+                    f"\n{marker}markdown\n"
+                    f"{marker}not-a-closing-fence\n"
+                    f"{original}\n"
+                )
+                workflow.write_text(workflow_text.replace(original, replacement, 1))
+
+                self.assertIn(
+                    "Codex workflow missing install-resolvable reference references/deep-change-checklist.md",
+                    validate_installed_codex_plugin(installed_plugin),
+                )
+
+    def test_installed_plugin_uses_tab_stops_for_indented_code(self):
+        original = "[portable Deep change checklist](references/deep-change-checklist.md)"
+        for indentation in ("   \t", " \t"):
+            with self.subTest(indentation=repr(indentation)):
+                temporary_directory = tempfile.TemporaryDirectory()
+                self.temporary_directories.append(temporary_directory)
+                installed_plugin = Path(temporary_directory.name) / "cache" / "careful" / "0.2.0"
+                shutil.copytree(ROOT / "plugins" / "careful", installed_plugin)
+                workflow = installed_plugin / "skills" / "careful-workflow" / "SKILL.md"
+                workflow_text = workflow.read_text()
+                workflow.write_text(
+                    workflow_text.replace(original, f"\n{indentation}{original}\n", 1)
+                )
+
+                self.assertIn(
+                    "Codex workflow missing install-resolvable reference references/deep-change-checklist.md",
+                    validate_installed_codex_plugin(installed_plugin),
+                )
+
+    def test_installed_plugin_accepts_links_after_valid_fence_closers(self):
+        original = "[portable Deep change checklist](references/deep-change-checklist.md)"
+        cases = (
+            ("```markdown", "```   "),
+            ("```markdown", "   ````\t"),
+            ("~~~~markdown", "~~~~~"),
+        )
+        for opener, closer in cases:
+            with self.subTest(opener=opener, closer=closer):
+                temporary_directory = tempfile.TemporaryDirectory()
+                self.temporary_directories.append(temporary_directory)
+                installed_plugin = Path(temporary_directory.name) / "cache" / "careful" / "0.2.0"
+                shutil.copytree(ROOT / "plugins" / "careful", installed_plugin)
+                workflow = installed_plugin / "skills" / "careful-workflow" / "SKILL.md"
+                workflow_text = workflow.read_text()
+                replacement = f"\n{opener}\nnot a link\n{closer}\n{original}\n"
+                workflow.write_text(workflow_text.replace(original, replacement, 1))
+
+                self.assertEqual(validate_installed_codex_plugin(installed_plugin), [])
+
+    def test_installed_plugin_does_not_close_a_longer_fence_with_a_shorter_marker(self):
+        original = "[portable Deep change checklist](references/deep-change-checklist.md)"
+        temporary_directory = tempfile.TemporaryDirectory()
+        self.temporary_directories.append(temporary_directory)
+        installed_plugin = Path(temporary_directory.name) / "cache" / "careful" / "0.2.0"
+        shutil.copytree(ROOT / "plugins" / "careful", installed_plugin)
+        workflow = installed_plugin / "skills" / "careful-workflow" / "SKILL.md"
+        workflow_text = workflow.read_text()
+        replacement = f"\n````markdown\n```\n{original}\n"
+        workflow.write_text(workflow_text.replace(original, replacement, 1))
+
+        self.assertIn(
+            "Codex workflow missing install-resolvable reference references/deep-change-checklist.md",
+            validate_installed_codex_plugin(installed_plugin),
+        )
+
     def test_each_canonical_field_is_required_in_checklist_and_template(self):
         for relative in (
             "core/deep-change-checklist.md",

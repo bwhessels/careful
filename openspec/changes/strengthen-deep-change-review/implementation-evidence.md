@@ -492,7 +492,7 @@ Totals: 5 passed, 0 failed (5 items)
 
 The next quality review found canonical-plan drift and additional parser bypasses. Before production changes, focused tests reproduced eight failures: a blank/comment separator after one valid dependency hid a later reciprocal cycle edge; whitespace-altered keys disappeared; duplicate items were accepted; an empty block received an imprecise diagnostic; and tilde-fenced, indented-code, and backslash-escaped pseudo-links were counted as installed references. The expanded matrix also covers no-colon/trailing-space and quoted keys, malformed indentation, duplicate declarations, backtick fences, images, inline code, and plain paths.
 
-The dependency parser now recognizes malformed key-like declarations instead of treating them as absent, permits blank/comment-only separators without truncating the block, and deterministically rejects noncanonical keys, indentation, inline or quoted values, duplicates, and empty lists. The implementation plan, contributor contract, design, and delta specification now state the same archived-provenance and canonical-metadata semantics. The Markdown destination extractor now excludes backtick and tilde fences, indented code blocks, inline code, image destinations, and odd-backslash-escaped pseudo-links before validating installed references.
+The dependency parser now recognizes malformed key-like declarations instead of treating them as absent, permits blank/comment-only separators without truncating the block, and deterministically rejects noncanonical keys, indentation, inline or quoted values, duplicates, and empty lists. The implementation plan, contributor contract, design, and delta specification now state the same archived-provenance and canonical-metadata semantics. The round-two Markdown extractor added exclusions for simple backtick/tilde fences, literal four-space or leading-tab code lines, inline code, image destinations, and odd-backslash-escaped pseudo-links. A later narrow review found that suffixed fence markers could close prematurely and mixed space/tab indentation still needed CommonMark tab-stop handling; those cases are not claimed as resolved by round-two evidence.
 
 Round-two deterministic verification:
 
@@ -518,3 +518,34 @@ Totals: 5 passed, 0 failed (5 items)
 ```
 
 `git diff --check` also passed. These are deterministic source/package checks only; this round does not claim a clean independent review, reinstall, or fresh-session behavioral verification.
+
+## Quality-review corrections: round three
+
+A narrow installed-Markdown review found two remaining bypasses. The focused RED run produced four failures: both backtick and tilde fence markers followed immediately by `not-a-closing-fence` prematurely ended an open fence, and both three-spaces-plus-tab and one-space-plus-tab indentation were treated as visible prose even though the tab advances indentation to column four.
+
+Fence closure now requires the same marker character, at least the opening marker length, and a whitespace-only suffix. Leading indentation is computed with four-column tab stops before fence/link handling. Validator-level controls prove exact and longer valid closers still expose a following legitimate link, three leading spaces plus a longer closer and tab suffix remain valid, and a shorter marker does not close a longer fence.
+
+Round-three deterministic verification:
+
+```text
+$ python3 -m unittest discover -s tests -v
+Ran 21 tests
+OK
+
+$ python3 scripts/validate_change_dependencies.py
+Careful active change dependencies passed
+
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py <each Codex, Claude Code, and Factory Droid workflow skill>
+Skill is valid! (3/3)
+
+$ python3 /Users/hessels/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/careful
+Plugin validation passed
+
+$ openspec validate --all --strict --no-interactive
+Totals: 5 passed, 0 failed (5 items)
+```
+
+`git diff --check` also passed. These deterministic checks do not claim a clean independent review, reinstall, or fresh-session behavioral verification.
