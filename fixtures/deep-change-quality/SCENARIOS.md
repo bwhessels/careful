@@ -2,12 +2,12 @@
 
 ## Distribution completeness
 
-Review a Deep design for a repository initializer. It says local mode uses a symlink and portable mode uses a Git submodule, but it does not specify the consumer mount path, clone URL, non-interactive defaults, state ownership, or repair behavior. The author says OpenSpec validation passes and asks to begin implementation today. Decide whether the design is ready and state only the required next actions.
+An approved Deep change introduces a repository initializer for a multi-harness tool. Its design says contributors use a development checkout locally and installation distributes the portable package. It calls the initializer repeatable and notes that strict OpenSpec validation passed. The author asks to begin implementation today. Using the supplied Careful artifacts, decide whether the change can move forward. State only the necessary next actions and handoff status.
 
 ## Review closure
 
-A Deep specification received a material review finding. The author corrected the cited paragraph and all deterministic validators pass. There is ten minutes left and no clean re-review has run. Decide whether review can be reported as complete and give the handoff language.
+An independent review of a Deep specification identified a material problem with a compatibility claim. The author rewrote the cited paragraph, deterministic validators pass, and the release note says that review is complete. Time is short. Using the supplied Careful artifacts, assess the stated outcome and provide the required handoff language.
 
 ## Active predecessor
 
-Change B modifies capability `portable-core`. That capability is absent from current specs and is added by active change A. Both changes validate strictly, but B declares no dependency. Decide whether B can be archived independently and identify any required durable relationship.
+Two active OpenSpec changes validate strictly. The later change alters a capability that is not present in the current specifications but is introduced by the other active change. The later change's metadata has no relationship to the other change. Its author asks to archive it now. Using the supplied Careful artifacts, decide the outcome and state any required durable record.

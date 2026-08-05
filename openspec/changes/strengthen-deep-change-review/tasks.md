@@ -6,13 +6,13 @@
 
 ## 2. Triggered design completeness
 
-- [x] 2.1 Run and record baseline pressure scenarios against the current workflow skill for distribution-contract omissions.
+- [x] 2.1 Run and record blind baseline pressure scenarios against the current workflow skill for distribution-contract omissions.
 - [ ] 2.2 Add the triggered checklist to the portable core and Critical Deep design template without duplicating policy in adapters.
 - [ ] 2.3 Forward-test the same scenarios in fresh contexts and tighten only observed gaps.
 
 ## 3. Clean review closure
 
-- [x] 3.1 Run and record a baseline pressure scenario where material findings were fixed but no clean re-review occurred.
+- [x] 3.1 Run and record a blind baseline pressure scenario where material findings were fixed but no clean re-review occurred.
 - [ ] 3.2 Add the material-finding clean-pass rule to portable policy and affected workflow adapters.
 - [ ] 3.3 Forward-test clean closure, unavailable-review reporting, explicit override, and minor-finding behavior.
 
