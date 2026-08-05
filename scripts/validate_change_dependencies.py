@@ -11,6 +11,9 @@ from pathlib import Path
 CAPABILITY_BULLET = re.compile(r"^- `([^`]+)`(?:\s*:|\s*$)")
 ARCHIVED_CHANGE = re.compile(r"^\d{4}-\d{2}-\d{2}-(.+)$")
 DEPENDENCY_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+DEPENDENCY_KEY_LIKE = re.compile(
+    r'''^(?:depends_on(?:\s*:.*|\s*)|["']depends_on["']\s*:.*)$'''
+)
 
 
 class DependencyMetadataError(ValueError):
@@ -48,7 +51,9 @@ def parse_dependencies(metadata: Path) -> tuple[str, ...]:
 
     lines = metadata.read_text().splitlines()
     declarations = [
-        index for index, line in enumerate(lines) if line.startswith("depends_on:")
+        index
+        for index, line in enumerate(lines)
+        if DEPENDENCY_KEY_LIKE.fullmatch(line.lstrip())
     ]
     if not declarations:
         return ()
@@ -56,6 +61,11 @@ def parse_dependencies(metadata: Path) -> tuple[str, ...]:
         raise DependencyMetadataError("depends_on must be declared once")
 
     declaration = declarations[0]
+    if (
+        lines[declaration] != lines[declaration].lstrip()
+        or not lines[declaration].startswith("depends_on:")
+    ):
+        raise DependencyMetadataError("depends_on key must be exactly 'depends_on:'")
     if lines[declaration] != "depends_on:":
         raise DependencyMetadataError(
             "use a top-level block list with two-space-indented unquoted items"
@@ -63,11 +73,17 @@ def parse_dependencies(metadata: Path) -> tuple[str, ...]:
 
     dependencies: list[str] = []
     for line in lines[declaration + 1 :]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
         if line.startswith("  - "):
             dependency = line.removeprefix("  - ")
             if not DEPENDENCY_NAME.fullmatch(dependency):
                 raise DependencyMetadataError(
                     "dependency names must be unquoted canonical change names"
+                )
+            if dependency in dependencies:
+                raise DependencyMetadataError(
+                    f"dependency {dependency} is listed more than once"
                 )
             dependencies.append(dependency)
             continue
@@ -77,9 +93,7 @@ def parse_dependencies(metadata: Path) -> tuple[str, ...]:
             "use a top-level block list with two-space-indented unquoted items"
         )
     if not dependencies:
-        raise DependencyMetadataError(
-            "use a top-level block list with two-space-indented unquoted items"
-        )
+        raise DependencyMetadataError("depends_on must contain at least one dependency")
     return tuple(dependencies)
 
 

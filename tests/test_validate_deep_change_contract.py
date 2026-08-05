@@ -94,6 +94,11 @@ class ValidateDeepChangeContractTests(unittest.TestCase):
             "references/deep-change-checklist.md",
             "`references/deep-change-checklist.md`",
             "`[portable Deep change checklist](references/deep-change-checklist.md)`",
+            "\n```markdown\n[portable Deep change checklist](references/deep-change-checklist.md)\n```\n",
+            "\n~~~markdown\n[portable Deep change checklist](references/deep-change-checklist.md)\n~~~\n",
+            "\n    [portable Deep change checklist](references/deep-change-checklist.md)\n",
+            "\\[portable Deep change checklist](references/deep-change-checklist.md)",
+            "![portable Deep change checklist](references/deep-change-checklist.md)",
         ):
             with self.subTest(replacement=replacement):
                 temporary_directory = tempfile.TemporaryDirectory()

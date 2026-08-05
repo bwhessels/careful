@@ -453,7 +453,7 @@ The following remain deliberately pending and their task checkboxes remain open:
 - Plugin cachebuster/reinstall followed by behavioral verification in a new Codex task. Task 3's isolated package pressure runs verify packaged artifacts, but they do not substitute for this installation boundary.
 - Final residual-risk and retrospective recording after those closure controls complete.
 
-## Final quality-review corrections
+## Quality-review corrections: round one
 
 The quality review identified three deterministic-control gaps. Test-first correction established these RED results before production edits:
 
@@ -461,9 +461,9 @@ The quality review identified three deterministic-control gaps. Test-first corre
 - Reciprocal inline lists were silently parsed as no dependencies, while a quoted block-list item was misreported as an unknown name including its quotes.
 - Plain or inline-code occurrences of an installed reference path satisfied Codex package validation without a Markdown link; self-review additionally proved that a Markdown-looking link inside backticks also bypassed a raw destination regex.
 
-The corrected contract recognizes original names from date-prefixed archive directories as satisfied historical provenance while keeping them outside the active cycle graph. `depends_on` accepts only the documented top-level, two-space-indented, unquoted block-list subset; noncanonical declarations become deterministic change-scoped metadata errors. Installed Codex validation now extracts actual non-image Markdown destinations outside backtick code spans/fences, and the workflow's core-contract references are real Markdown links.
+The round-one correction recognizes original names from date-prefixed archive directories as satisfied historical provenance while keeping them outside the active cycle graph. `depends_on` accepts the documented top-level, two-space-indented, unquoted block-list subset and rejects the inline and quoted cases tested in that round. Installed Codex validation was strengthened for plain paths, images, and backtick-delimited pseudo-links, and the workflow's core-contract references became real Markdown links. A later review showed that whitespace-altered dependency keys, blank/comment truncation, tilde fences, indented code, and escaped pseudo-links still required explicit coverage; those gaps are not claimed as resolved by this round-one evidence.
 
-Final deterministic verification after these corrections:
+Round-one deterministic verification at that revision:
 
 ```text
 $ python3 -m unittest discover -s tests -v
@@ -487,3 +487,34 @@ Totals: 5 passed, 0 failed (5 items)
 ```
 
 `git diff --check` also passed. This evidence records corrections and deterministic verification only; it does not claim a clean independent review, adapter reinstall, or fresh-session behavioral verification.
+
+## Quality-review corrections: round two
+
+The next quality review found canonical-plan drift and additional parser bypasses. Before production changes, focused tests reproduced eight failures: a blank/comment separator after one valid dependency hid a later reciprocal cycle edge; whitespace-altered keys disappeared; duplicate items were accepted; an empty block received an imprecise diagnostic; and tilde-fenced, indented-code, and backslash-escaped pseudo-links were counted as installed references. The expanded matrix also covers no-colon/trailing-space and quoted keys, malformed indentation, duplicate declarations, backtick fences, images, inline code, and plain paths.
+
+The dependency parser now recognizes malformed key-like declarations instead of treating them as absent, permits blank/comment-only separators without truncating the block, and deterministically rejects noncanonical keys, indentation, inline or quoted values, duplicates, and empty lists. The implementation plan, contributor contract, design, and delta specification now state the same archived-provenance and canonical-metadata semantics. The Markdown destination extractor now excludes backtick and tilde fences, indented code blocks, inline code, image destinations, and odd-backslash-escaped pseudo-links before validating installed references.
+
+Round-two deterministic verification:
+
+```text
+$ python3 -m unittest discover -s tests -v
+Ran 17 tests
+OK
+
+$ python3 scripts/validate_change_dependencies.py
+Careful active change dependencies passed
+
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py <each Codex, Claude Code, and Factory Droid workflow skill>
+Skill is valid! (3/3)
+
+$ python3 /Users/hessels/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/careful
+Plugin validation passed
+
+$ openspec validate --all --strict --no-interactive
+Totals: 5 passed, 0 failed (5 items)
+```
+
+`git diff --check` also passed. These are deterministic source/package checks only; this round does not claim a clean independent review, reinstall, or fresh-session behavioral verification.

@@ -49,6 +49,7 @@ CLEAN_CLOSURE_SEMANTICS = (
     "accepted override",
 )
 MARKDOWN_CODE = re.compile(r"(`+).*?\1", re.DOTALL)
+MARKDOWN_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^]]+\]\(([^)\s]+)(?:\s+[^)]*)?\)")
 
 
@@ -59,7 +60,36 @@ def require(condition: bool, message: str) -> None:
 
 def markdown_link_destinations(text: str) -> set[str]:
     """Return link destinations outside Markdown code spans and fences."""
-    return set(MARKDOWN_LINK.findall(MARKDOWN_CODE.sub("", text)))
+    visible_lines: list[str] = []
+    fence_character: str | None = None
+    fence_length = 0
+    for line in text.splitlines():
+        fence = MARKDOWN_FENCE.match(line)
+        if fence:
+            marker = fence.group(1)
+            if fence_character is None:
+                fence_character = marker[0]
+                fence_length = len(marker)
+            elif marker[0] == fence_character and len(marker) >= fence_length:
+                fence_character = None
+                fence_length = 0
+            continue
+        if fence_character is not None or line.startswith("    ") or line.startswith("\t"):
+            continue
+        visible_lines.append(line)
+
+    visible_text = MARKDOWN_CODE.sub("", "\n".join(visible_lines))
+    destinations: set[str] = set()
+    for link in MARKDOWN_LINK.finditer(visible_text):
+        preceding_backslashes = 0
+        index = link.start() - 1
+        while index >= 0 and visible_text[index] == "\\":
+            preceding_backslashes += 1
+            index -= 1
+        if preceding_backslashes % 2:
+            continue
+        destinations.add(link.group(1))
+    return destinations
 
 
 def parse_adapter_manifest(path: Path) -> tuple[int | None, str | None, dict[str, dict[str, str]]]:

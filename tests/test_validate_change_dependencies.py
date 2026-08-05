@@ -175,6 +175,83 @@ class ValidateChangeDependenciesTests(unittest.TestCase):
             ],
         )
 
+    def test_blank_and_comment_lines_do_not_hide_a_later_cycle_edge(self):
+        root = self.fixture(
+            current=(),
+            changes={
+                "change-a": {},
+                "change-b": {"depends_on": ("change-a",)},
+                "change-c": {},
+            },
+        )
+        metadata = root / "openspec" / "changes" / "change-a" / ".openspec.yaml"
+        metadata.write_text(
+            "schema: spec-driven\n"
+            "depends_on:\n"
+            "  - change-c\n"
+            "\n"
+            "  # this separator must not hide the next edge\n"
+            "  - change-b\n"
+        )
+
+        self.assertEqual(
+            validate_change_dependencies(root),
+            ["dependency cycle: change-a -> change-b -> change-a"],
+        )
+
+    def test_rejects_whitespace_variants_of_the_dependency_key(self):
+        for declaration in (
+            "depends_on :",
+            " depends_on:",
+            "depends_on",
+            "depends_on   ",
+            '"depends_on":',
+        ):
+            with self.subTest(declaration=declaration):
+                root = self.fixture(current=(), changes={"change-a": {}, "change-b": {}})
+                metadata = root / "openspec" / "changes" / "change-a" / ".openspec.yaml"
+                metadata.write_text(
+                    f"schema: spec-driven\n{declaration}\n  - change-b\n"
+                )
+                self.assertEqual(
+                    validate_change_dependencies(root),
+                    [
+                        "change-a has invalid depends_on metadata: depends_on key must be exactly 'depends_on:'"
+                    ],
+                )
+
+    def test_rejects_duplicate_and_empty_dependency_lists(self):
+        cases = (
+            (
+                "depends_on:\n  - change-b\ndepends_on:\n  - change-c\n",
+                "depends_on must be declared once",
+            ),
+            (
+                "depends_on:\n  - change-b\n  - change-b\n",
+                "dependency change-b is listed more than once",
+            ),
+            (
+                "depends_on:\n# no dependencies\n",
+                "depends_on must contain at least one dependency",
+            ),
+            (
+                "depends_on:\n    - change-b\n",
+                "use a top-level block list with two-space-indented unquoted items",
+            ),
+        )
+        for metadata_body, message in cases:
+            with self.subTest(message=message):
+                root = self.fixture(
+                    current=(),
+                    changes={"change-a": {}, "change-b": {}, "change-c": {}},
+                )
+                metadata = root / "openspec" / "changes" / "change-a" / ".openspec.yaml"
+                metadata.write_text("schema: spec-driven\n" + metadata_body)
+                self.assertEqual(
+                    validate_change_dependencies(root),
+                    [f"change-a has invalid depends_on metadata: {message}"],
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

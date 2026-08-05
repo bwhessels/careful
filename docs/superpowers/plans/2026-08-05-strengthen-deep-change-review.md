@@ -113,7 +113,7 @@ git commit -m "test: capture deep change review baselines"
 **Interfaces:**
 - Produces: `validate_change_dependencies(root: pathlib.Path) -> list[str]`, returning deterministic human-readable errors.
 - Produces: CLI `python3 scripts/validate_change_dependencies.py [root]`, exit `0` with a success line or exit `1` with one line per error.
-- Consumes: `openspec/specs/<capability>/spec.md`, active `openspec/changes/<name>/proposal.md`, and optional `.openspec.yaml` `depends_on` lists.
+- Consumes: `openspec/specs/<capability>/spec.md`, active `openspec/changes/<name>/proposal.md`, optional `.openspec.yaml` `depends_on` lists, and date-prefixed `openspec/changes/archive/YYYY-MM-DD-<name>/` identities as satisfied historical provenance. Archived identities never become active cycle-graph nodes.
 
 - [ ] **Step 1: Write the failing unit tests**
 
@@ -181,6 +181,8 @@ def test_current_capability_requires_no_predecessor(self):
 
 The fixture helper must write real proposal headings and `.openspec.yaml` files; it must not mock parser functions.
 
+Also cover date-prefixed archived predecessors, with the original name accepted as satisfied provenance while truly absent names remain unknown. Add deterministic malformed-metadata cases for inline lists, quoted items, whitespace-altered keys such as `depends_on :`, malformed indentation, duplicate declarations/items, and empty lists. Prove blank and comment separator lines cannot truncate a canonical block and hide a later dependency or cycle edge.
+
 - [ ] **Step 2: Run the dependency tests and verify RED**
 
 Run:
@@ -195,7 +197,7 @@ Expected: import failure for `scripts.validate_change_dependencies` because prod
 
 Create `scripts/validate_change_dependencies.py` with the exact public signatures `parse_capabilities(proposal: Path) -> tuple[set[str], set[str]]`, `parse_dependencies(metadata: Path) -> tuple[str, ...]`, `validate_change_dependencies(root: Path) -> list[str]`, and `main(argv: list[str] | None = None) -> int`.
 
-Parse only `### New Capabilities`, `### Modified Capabilities`, and backticked bullet identifiers. Parse only a top-level `depends_on:` followed by two-space-indented `- <change-name>` values. Ignore `archive/`. Return errors sorted lexically. Detect unknown dependencies, self-dependencies, cycles, and missing providers for non-current modified capabilities.
+Parse only `### New Capabilities`, `### Modified Capabilities`, and backticked bullet identifiers. Parse only the canonical top-level `depends_on:` block with two-space-indented, unquoted `- <change-name>` values; blank and comment lines may separate items but must not end the block. Reject inline, quoted, whitespace-key, malformed-indentation, duplicate, and empty declarations with deterministic change-scoped errors instead of treating them as absent. Read date-prefixed archive directory names as satisfied predecessor identities, but keep archived changes outside the active dependency graph. Return errors sorted lexically. Detect unknown dependencies, self-dependencies, active cycles, and missing providers for non-current modified capabilities.
 
 - [ ] **Step 4: Run the unit tests and verify GREEN**
 

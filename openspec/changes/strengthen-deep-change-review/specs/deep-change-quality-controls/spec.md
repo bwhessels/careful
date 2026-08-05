@@ -2,7 +2,7 @@
 
 ### Requirement: Active OpenSpec dependency validation
 
-Careful SHALL validate dependencies between active OpenSpec changes. A change that modifies a capability absent from current specs but added by another active change SHALL declare that predecessor under `depends_on` in its `.openspec.yaml`. The declaration SHALL use a top-level block list with two-space-indented, unquoted change names; noncanonical inline or quoted forms SHALL fail clearly.
+Careful SHALL validate dependencies between active OpenSpec changes. A change that modifies a capability absent from current specs but added by another active change SHALL declare that predecessor under `depends_on` in its `.openspec.yaml`. The declaration SHALL use a top-level block list with two-space-indented, unquoted, unique change names. Blank and comment-only separators SHALL NOT terminate the list; noncanonical inline, quoted, whitespace-key, malformed-indentation, duplicate, or empty forms SHALL fail clearly.
 
 #### Scenario: Modified capability is introduced by an active predecessor
 
@@ -21,10 +21,11 @@ Careful SHALL validate dependencies between active OpenSpec changes. A change th
 - **THEN** validation SHALL accept A's original change name as satisfied historical provenance
 - **AND** a name absent from both active changes and date-prefixed archives SHALL remain unknown
 
-#### Scenario: Dependency metadata is noncanonical
+#### Scenario: Dependency metadata is noncanonical or truncated
 
-- **WHEN** an active change uses an inline `depends_on` list or quoted dependency item
+- **WHEN** an active change uses an inline list, quoted item, whitespace-altered key, malformed indentation, duplicate, or empty `depends_on` form
 - **THEN** validation SHALL fail with a deterministic change-scoped metadata error
+- **AND** blank or comment-only lines in a canonical block SHALL NOT hide later dependency or cycle edges
 
 #### Scenario: Modified capability is already current
 
