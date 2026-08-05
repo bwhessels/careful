@@ -15,7 +15,7 @@ depends_on:
   - multi-harness-adapters
 ```
 
-The validator SHALL read active change proposals and current capability directories. When change B modifies a capability absent from `openspec/specs/` and change A adds that capability, B SHALL list A in `depends_on`. Validation SHALL reject missing active dependencies, unknown dependency names, self-dependencies, and dependency cycles. It SHALL report the consumer change, capability, and required predecessor.
+The validator SHALL read active change proposals, current capability directories, and date-prefixed archive directory identities. When change B modifies a capability absent from `openspec/specs/` and change A adds that capability, B SHALL list A in `depends_on`. The canonical metadata subset is a top-level `depends_on:` key followed by two-space-indented, unquoted change-name items; noncanonical inline or quoted forms SHALL fail clearly instead of being interpreted partially. An active change may retain an archived predecessor's original name after predecessor-first archival; a matching `YYYY-MM-DD-<name>` archive directory satisfies provenance without joining the active dependency graph. Validation SHALL reject missing active dependencies, names absent from active changes and date-prefixed archives, self-dependencies, and active dependency cycles. It SHALL report the consumer change, capability, and required predecessor.
 
 The check SHALL use the Python standard library and remain separate from OpenSpec's schema validation. `scripts/validate_self_hosting.py` SHALL invoke it so the project validation command cannot omit the rule.
 

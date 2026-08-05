@@ -2,7 +2,7 @@
 
 ### Requirement: Active OpenSpec dependency validation
 
-Careful SHALL validate dependencies between active OpenSpec changes. A change that modifies a capability absent from current specs but added by another active change SHALL declare that predecessor under `depends_on` in its `.openspec.yaml`.
+Careful SHALL validate dependencies between active OpenSpec changes. A change that modifies a capability absent from current specs but added by another active change SHALL declare that predecessor under `depends_on` in its `.openspec.yaml`. The declaration SHALL use a top-level block list with two-space-indented, unquoted change names; noncanonical inline or quoted forms SHALL fail clearly.
 
 #### Scenario: Modified capability is introduced by an active predecessor
 
@@ -14,6 +14,17 @@ Careful SHALL validate dependencies between active OpenSpec changes. A change th
 
 - **WHEN** an active change declares an unknown change, itself, or a dependency cycle
 - **THEN** validation SHALL fail with the involved change names
+
+#### Scenario: Predecessor has been archived first
+
+- **WHEN** an active change retains a dependency on predecessor A and A has moved to a date-prefixed OpenSpec archive directory
+- **THEN** validation SHALL accept A's original change name as satisfied historical provenance
+- **AND** a name absent from both active changes and date-prefixed archives SHALL remain unknown
+
+#### Scenario: Dependency metadata is noncanonical
+
+- **WHEN** an active change uses an inline `depends_on` list or quoted dependency item
+- **THEN** validation SHALL fail with a deterministic change-scoped metadata error
 
 #### Scenario: Modified capability is already current
 

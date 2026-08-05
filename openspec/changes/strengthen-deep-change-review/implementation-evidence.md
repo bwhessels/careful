@@ -452,3 +452,38 @@ The following remain deliberately pending and their task checkboxes remain open:
 - A clean confirmation pass after any material correction arising from those reviews.
 - Plugin cachebuster/reinstall followed by behavioral verification in a new Codex task. Task 3's isolated package pressure runs verify packaged artifacts, but they do not substitute for this installation boundary.
 - Final residual-risk and retrospective recording after those closure controls complete.
+
+## Final quality-review corrections
+
+The quality review identified three deterministic-control gaps. Test-first correction established these RED results before production edits:
+
+- An active change retaining `depends_on: change-a` failed as unknown after `change-a` moved to `archive/2026-08-04-change-a/`.
+- Reciprocal inline lists were silently parsed as no dependencies, while a quoted block-list item was misreported as an unknown name including its quotes.
+- Plain or inline-code occurrences of an installed reference path satisfied Codex package validation without a Markdown link; self-review additionally proved that a Markdown-looking link inside backticks also bypassed a raw destination regex.
+
+The corrected contract recognizes original names from date-prefixed archive directories as satisfied historical provenance while keeping them outside the active cycle graph. `depends_on` accepts only the documented top-level, two-space-indented, unquoted block-list subset; noncanonical declarations become deterministic change-scoped metadata errors. Installed Codex validation now extracts actual non-image Markdown destinations outside backtick code spans/fences, and the workflow's core-contract references are real Markdown links.
+
+Final deterministic verification after these corrections:
+
+```text
+$ python3 -m unittest discover -s tests -v
+Ran 14 tests in 0.237s
+OK
+
+$ python3 scripts/validate_change_dependencies.py
+Careful active change dependencies passed
+
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+
+$ python3 /Users/hessels/.codex/skills/.system/skill-creator/scripts/quick_validate.py plugins/careful/skills/careful-workflow
+Skill is valid!
+
+$ python3 /Users/hessels/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/careful
+Plugin validation passed
+
+$ openspec validate --all --strict --no-interactive
+Totals: 5 passed, 0 failed (5 items)
+```
+
+`git diff --check` also passed. This evidence records corrections and deterministic verification only; it does not claim a clean independent review, adapter reinstall, or fresh-session behavioral verification.

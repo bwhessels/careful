@@ -88,6 +88,28 @@ class ValidateDeepChangeContractTests(unittest.TestCase):
             errors,
         )
 
+    def test_installed_plugin_requires_markdown_link_destinations(self):
+        original = "[portable Deep change checklist](references/deep-change-checklist.md)"
+        for replacement in (
+            "references/deep-change-checklist.md",
+            "`references/deep-change-checklist.md`",
+            "`[portable Deep change checklist](references/deep-change-checklist.md)`",
+        ):
+            with self.subTest(replacement=replacement):
+                temporary_directory = tempfile.TemporaryDirectory()
+                self.temporary_directories.append(temporary_directory)
+                installed_plugin = Path(temporary_directory.name) / "cache" / "careful" / "0.2.0"
+                shutil.copytree(ROOT / "plugins" / "careful", installed_plugin)
+                workflow = installed_plugin / "skills" / "careful-workflow" / "SKILL.md"
+                workflow_text = workflow.read_text()
+                self.assertIn(original, workflow_text)
+                workflow.write_text(workflow_text.replace(original, replacement, 1))
+
+                self.assertIn(
+                    "Codex workflow missing install-resolvable reference references/deep-change-checklist.md",
+                    validate_installed_codex_plugin(installed_plugin),
+                )
+
     def test_each_canonical_field_is_required_in_checklist_and_template(self):
         for relative in (
             "core/deep-change-checklist.md",

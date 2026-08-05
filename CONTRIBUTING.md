@@ -28,7 +28,7 @@ depends_on:
   - predecessor-change-name
 ```
 
-Use this when the later change modifies a capability that is not yet current and the predecessor adds it. `scripts/validate_change_dependencies.py` checks required declarations, unknown or self dependencies, and cycles; it complements rather than replaces strict OpenSpec validation.
+Use this when the later change modifies a capability that is not yet current and the predecessor adds it. Keep this canonical two-space-indented block-list form with unquoted change names; inline lists and quoted items fail validation rather than being guessed at. When a predecessor is archived first, retain its original name in `depends_on`: the validator recognizes the date-prefixed OpenSpec archive directory as durable provenance. Names absent from both active changes and date-prefixed archives remain unknown. `scripts/validate_change_dependencies.py` also checks required declarations, self dependencies, and active dependency cycles; it complements rather than replaces strict OpenSpec validation.
 
 ## Review and merging
 

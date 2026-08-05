@@ -48,11 +48,18 @@ CLEAN_CLOSURE_SEMANTICS = (
     "residual risk",
     "accepted override",
 )
+MARKDOWN_CODE = re.compile(r"(`+).*?\1", re.DOTALL)
+MARKDOWN_LINK = re.compile(r"(?<!!)\[[^]]+\]\(([^)\s]+)(?:\s+[^)]*)?\)")
 
 
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise SystemExit(f"FAIL: {message}")
+
+
+def markdown_link_destinations(text: str) -> set[str]:
+    """Return link destinations outside Markdown code spans and fences."""
+    return set(MARKDOWN_LINK.findall(MARKDOWN_CODE.sub("", text)))
 
 
 def parse_adapter_manifest(path: Path) -> tuple[int | None, str | None, dict[str, dict[str, str]]]:
@@ -84,15 +91,18 @@ def validate_installed_codex_plugin(plugin_root: Path) -> list[str]:
     if not workflow.is_file():
         return ["installed Codex plugin missing careful-workflow/SKILL.md"]
     workflow_text = workflow.read_text()
+    workflow_destinations = markdown_link_destinations(workflow_text)
     for relative_reference in ("references/core-contract.md", "references/deep-change-checklist.md"):
-        if relative_reference not in workflow_text:
+        if relative_reference not in workflow_destinations:
             errors.append(f"Codex workflow missing install-resolvable reference {relative_reference}")
         elif not (workflow.parent / relative_reference).is_file():
             errors.append(f"Codex installed reference does not resolve: {relative_reference}")
     if not bundled_policy.is_file():
         errors.append("installed Codex plugin missing bundled core-contract.md")
     else:
-        for relative_reference in re.findall(r"\[[^]]+\]\(([^)]+\.md)\)", bundled_policy.read_text()):
+        for relative_reference in markdown_link_destinations(bundled_policy.read_text()):
+            if not relative_reference.endswith(".md"):
+                continue
             if not (bundled_policy.parent / relative_reference).is_file():
                 errors.append(f"Codex bundled policy reference does not resolve: {relative_reference}")
     return sorted(errors)

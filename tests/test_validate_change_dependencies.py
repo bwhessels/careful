@@ -82,6 +82,24 @@ class ValidateChangeDependenciesTests(unittest.TestCase):
         )
         self.assertEqual(validate_change_dependencies(root), [])
 
+    def test_accepts_dependency_on_date_prefixed_archived_predecessor(self):
+        root = self.fixture(
+            current=("portable-core",),
+            changes={
+                "change-b": {
+                    "modified": ("portable-core",),
+                    "depends_on": ("change-a",),
+                },
+            },
+        )
+        archived = root / "openspec" / "changes" / "archive" / "2026-08-04-change-a"
+        archived.mkdir(parents=True)
+        (archived / "proposal.md").write_text(
+            "## Capabilities\n\n### New Capabilities\n\n- `portable-core`: fixture\n"
+        )
+
+        self.assertEqual(validate_change_dependencies(root), [])
+
     def test_rejects_unknown_self_and_cycle_dependencies(self):
         cases = (
             (
@@ -124,6 +142,38 @@ class ValidateChangeDependenciesTests(unittest.TestCase):
             proposal_file.write("## Impact\n\n- `not-a-capability`: affected component\n")
 
         self.assertEqual(parse_capabilities(proposal), ({"portable-core"}, set()))
+
+    def test_rejects_reciprocal_inline_dependency_lists_clearly(self):
+        root = self.fixture(
+            current=(),
+            changes={"change-a": {}, "change-b": {}},
+        )
+        for change, dependency in (("change-a", "change-b"), ("change-b", "change-a")):
+            metadata = root / "openspec" / "changes" / change / ".openspec.yaml"
+            metadata.write_text(f"schema: spec-driven\ndepends_on: [{dependency}]\n")
+
+        self.assertEqual(
+            validate_change_dependencies(root),
+            [
+                "change-a has invalid depends_on metadata: use a top-level block list with two-space-indented unquoted items",
+                "change-b has invalid depends_on metadata: use a top-level block list with two-space-indented unquoted items",
+            ],
+        )
+
+    def test_rejects_quoted_dependency_values_clearly(self):
+        root = self.fixture(
+            current=(),
+            changes={"change-a": {}, "change-b": {}},
+        )
+        metadata = root / "openspec" / "changes" / "change-a" / ".openspec.yaml"
+        metadata.write_text('schema: spec-driven\ndepends_on:\n  - "change-b"\n')
+
+        self.assertEqual(
+            validate_change_dependencies(root),
+            [
+                "change-a has invalid depends_on metadata: dependency names must be unquoted canonical change names"
+            ],
+        )
 
 
 if __name__ == "__main__":

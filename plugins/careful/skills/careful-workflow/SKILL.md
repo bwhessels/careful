@@ -5,7 +5,7 @@ description: Run the default Careful workflow for product exploration, feature w
 
 # Careful Workflow
 
-Apply Careful without requiring the user to remember workflow commands. Read `references/core-contract.md` before beginning substantive work.
+Apply Careful without requiring the user to remember workflow commands. Read the [portable core contract](references/core-contract.md) before beginning substantive work.
 
 ## Classify and select depth
 
@@ -32,7 +32,7 @@ Route the Deep distribution check from the request and repository evidence: when
 7. For behavior, contract, architecture, configuration, operational, or contributor-workflow changes, apply the documentation map inline: identify the canonical document, update it once, or retain evidence for a no-impact conclusion. Do not require a documentation command for this baseline check.
 8. For Deep work, obtain an independent review after implementation. Separate spec/decision compliance from code/product quality. After correcting a material finding, obtain an independent review of the corrected artifact; claim clean closure only after a pass with no material actionable findings. Otherwise report unavailable review, residual risk, or an accepted override.
 9. Before finalizing, assess retrospective signals: blocks, overrides, material review findings, failed verification, repeated rework, and durable user corrections. Report no high-signal candidate or present concise evidence-backed candidates. Do not require a retrospective command for this baseline check.
-10. Provide the final handoff in the format in `references/core-contract.md`, including documentation-impact and retrospective-assessment results when applicable.
+10. Provide the final handoff in the format in the [portable core contract](references/core-contract.md), including documentation-impact and retrospective-assessment results when applicable.
 
 ## Special entry points
 
