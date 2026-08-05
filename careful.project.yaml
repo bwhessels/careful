@@ -4,6 +4,7 @@ project:
   maturity: self-hosting
 
 commands:
+  validate_change_dependencies: python3 scripts/validate_change_dependencies.py
   validate_self_hosting: python3 scripts/validate_self_hosting.py
   validate_specs: openspec validate --specs
 

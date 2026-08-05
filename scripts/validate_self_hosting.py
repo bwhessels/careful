@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from validate_change_dependencies import validate_change_dependencies
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -49,6 +50,9 @@ def parse_adapter_manifest(path: Path) -> tuple[int | None, str | None, dict[str
 
 
 def main() -> None:
+    dependency_errors = validate_change_dependencies(ROOT)
+    require(not dependency_errors, "\nFAIL: ".join(dependency_errors))
+
     policy = CORE / "policy.md"
     manifest_file = CORE / "adapter-manifest.yaml"
     require(policy.is_file(), "portable policy must exist")
