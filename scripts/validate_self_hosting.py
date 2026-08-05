@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from validate_change_dependencies import validate_change_dependencies
@@ -21,6 +22,31 @@ GUIDANCE_FILES = (
     ROOT / "AGENTS.md",
     ROOT / "fixtures" / "adopted-project" / "codex" / "AGENTS.md",
     PLUGIN / "skills" / "careful-adopt" / "references" / "project-guidance.md",
+)
+DEEP_CHANGE_FIELDS = (
+    "Bootstrap and discovery:",
+    "Consumer path and reference resolution:",
+    "Cloneable source and immutable version:",
+    "Interactive, dry-run, and non-interactive defaults:",
+    "Tracked, ignored, local, and private state:",
+    "Upgrade, repair, migration, rollback, and destructive boundaries:",
+)
+DEEP_CHANGE_TRIGGERS = (
+    "command",
+    "initializer",
+    "installer",
+    "package or plugin distribution",
+    "symlink or submodule layout",
+    "generated project guidance",
+    "shared filesystem artifact",
+)
+CLEAN_CLOSURE_SEMANTICS = (
+    "material Deep review finding",
+    "independent review of the corrected artifact",
+    "pass with no material actionable findings",
+    "unavailable review",
+    "residual risk",
+    "accepted override",
 )
 
 
@@ -49,9 +75,102 @@ def parse_adapter_manifest(path: Path) -> tuple[int | None, str | None, dict[str
     return version, core_policy, adapters
 
 
+def validate_installed_codex_plugin(plugin_root: Path) -> list[str]:
+    """Validate references using only the files shipped in a Codex plugin package."""
+    workflow_root = plugin_root / "skills" / "careful-workflow"
+    workflow = workflow_root / "SKILL.md"
+    bundled_policy = workflow_root / "references" / "core-contract.md"
+    errors: list[str] = []
+    if not workflow.is_file():
+        return ["installed Codex plugin missing careful-workflow/SKILL.md"]
+    workflow_text = workflow.read_text()
+    for relative_reference in ("references/core-contract.md", "references/deep-change-checklist.md"):
+        if relative_reference not in workflow_text:
+            errors.append(f"Codex workflow missing install-resolvable reference {relative_reference}")
+        elif not (workflow.parent / relative_reference).is_file():
+            errors.append(f"Codex installed reference does not resolve: {relative_reference}")
+    if not bundled_policy.is_file():
+        errors.append("installed Codex plugin missing bundled core-contract.md")
+    else:
+        for relative_reference in re.findall(r"\[[^]]+\]\(([^)]+\.md)\)", bundled_policy.read_text()):
+            if not (bundled_policy.parent / relative_reference).is_file():
+                errors.append(f"Codex bundled policy reference does not resolve: {relative_reference}")
+    return sorted(errors)
+
+
+def validate_deep_change_contract(root: Path) -> list[str]:
+    """Return deterministic errors for the portable Deep contract and its renderings."""
+    core = root / "core"
+    plugin_workflow_root = root / "plugins" / "careful" / "skills" / "careful-workflow"
+    policy = core / "policy.md"
+    checklist = core / "deep-change-checklist.md"
+    design = root / "examples" / "openspec-schemas" / "critical-deep" / "templates" / "design.md"
+    bundled_policy = plugin_workflow_root / "references" / "core-contract.md"
+    bundled_checklist = plugin_workflow_root / "references" / "deep-change-checklist.md"
+    workflow_files = (
+        plugin_workflow_root / "SKILL.md",
+        root / "adapters" / "claude-code" / ".claude" / "skills" / "careful-workflow" / "SKILL.md",
+        root / "adapters" / "factory-droid" / ".factory" / "skills" / "careful-workflow" / "SKILL.md",
+    )
+    errors: list[str] = []
+
+    required_files = (policy, checklist, design, bundled_policy, bundled_checklist, *workflow_files)
+    for path in required_files:
+        if not path.is_file():
+            errors.append(f"missing Deep contract file: {path.relative_to(root)}")
+    if errors:
+        return sorted(errors)
+
+    policy_text = policy.read_text()
+    checklist_text = checklist.read_text()
+    design_text = design.read_text()
+    for path, text in ((checklist, checklist_text), (design, design_text)):
+        for field in DEEP_CHANGE_FIELDS:
+            if field not in text:
+                errors.append(f"{path.relative_to(root)} missing canonical field {field}")
+        for trigger in DEEP_CHANGE_TRIGGERS:
+            if trigger not in text:
+                errors.append(f"{path.relative_to(root)} missing trigger {trigger}")
+
+    evidenced_rules = (
+        (checklist, "`Not applicable` followed by concrete repository evidence"),
+        (design, "`Not applicable` statement followed by concrete repository evidence"),
+    )
+    for path, phrase in evidenced_rules:
+        if phrase not in path.read_text():
+            errors.append(f"{path.relative_to(root)} missing evidenced rule {phrase}")
+
+    clean_closure_rule = next(
+        (line for line in policy_text.splitlines() if line.startswith("After correcting a material Deep review finding")),
+        "",
+    )
+    for semantic in CLEAN_CLOSURE_SEMANTICS:
+        if semantic not in clean_closure_rule:
+            errors.append(f"core/policy.md missing clean-closure semantic {semantic}")
+
+    if bundled_policy.read_text() != policy_text:
+        errors.append("Codex bundled core-contract.md must exactly render core/policy.md")
+    if bundled_checklist.read_text() != checklist_text:
+        errors.append("Codex bundled deep-change-checklist.md must exactly render core/deep-change-checklist.md")
+
+    errors.extend(validate_installed_codex_plugin(root / "plugins" / "careful"))
+
+    for workflow_file in workflow_files:
+        workflow_text = workflow_file.read_text()
+        duplicated_fields = [field for field in DEEP_CHANGE_FIELDS if field in workflow_text]
+        if duplicated_fields:
+            errors.append(
+                f"{workflow_file.relative_to(root)} duplicates portable Deep checklist fields: {duplicated_fields}"
+            )
+    return sorted(errors)
+
+
 def main() -> None:
     dependency_errors = validate_change_dependencies(ROOT)
     require(not dependency_errors, "\nFAIL: ".join(dependency_errors))
+
+    deep_contract_errors = validate_deep_change_contract(ROOT)
+    require(not deep_contract_errors, "\nFAIL: ".join(deep_contract_errors))
 
     policy = CORE / "policy.md"
     deep_change_checklist = CORE / "deep-change-checklist.md"
@@ -89,8 +208,6 @@ def main() -> None:
     require("retrospective signals" in workflow, "workflow must own baseline retrospective checks")
     require("careful.project.yaml" in workflow, "workflow must discover the self-hosting profile")
     require("deep-change-checklist.md" in workflow, "Codex workflow must reference the portable Deep change checklist")
-    bridge = (PLUGIN / "skills" / "careful-workflow" / "references" / "core-contract.md").read_text()
-    require("core/policy.md" in bridge, "Codex bridge must reference portable policy")
 
     ignore = (ROOT / ".gitignore").read_text()
     require(".careful/" in ignore, "private .careful context must be ignored")
@@ -146,26 +263,6 @@ def main() -> None:
     deep_design = (ROOT / "examples" / "openspec-schemas" / "critical-deep" / "templates" / "design.md").read_text()
     require("## Distribution contract" in deep_design, "Critical Deep design template must provide a Distribution contract")
 
-    checklist_fields = (
-        "Bootstrap and discovery:",
-        "Consumer path and reference resolution:",
-        "Cloneable source and immutable version:",
-        "Interactive, dry-run, and non-interactive defaults:",
-        "Tracked, ignored, local, and private state:",
-        "Upgrade, repair, migration, rollback, and destructive boundaries:",
-    )
-    workflow_files = [
-        PLUGIN / "skills" / "careful-workflow" / "SKILL.md",
-        ADAPTERS["claude-code"] / ".claude" / "skills" / "careful-workflow" / "SKILL.md",
-        ADAPTERS["factory-droid"] / ".factory" / "skills" / "careful-workflow" / "SKILL.md",
-    ]
-    for workflow_file in workflow_files:
-        workflow_text = workflow_file.read_text()
-        duplicated_fields = [field for field in checklist_fields if field in workflow_text]
-        require(
-            not duplicated_fields,
-            f"{workflow_file.relative_to(ROOT)} duplicates portable Deep checklist fields: {duplicated_fields}",
-        )
     print("Careful self-hosting validation passed")
 
 

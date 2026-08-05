@@ -153,3 +153,243 @@ No override is stated; therefore the dependency risk must not be recorded as res
 ```
 
 The previously passing behavior remains intact. Task 3 introduced no active-predecessor workflow wording; the deterministic command visible in the public project profile comes from Task 2.
+
+## Task 3 independent-review fix round 1
+
+### Structural and installed-layout RED
+
+The independent review found that the first Codex checklist link escaped the installed plugin subtree. A cache-shaped copy of only `plugins/careful/` contained no `core/`, so `../../../../core/deep-change-checklist.md` did not resolve. The first structural unit run also failed before any correction:
+
+```text
+$ python3 -m unittest tests.test_validate_deep_change_contract -v
+ImportError: cannot import name 'validate_deep_change_contract' from 'validate_self_hosting'
+FAILED (errors=1)
+```
+
+The new negative fixtures remove each of the six canonical fields from both the checklist and template, remove the full trigger and evidenced-`Not applicable` rules, remove each clean-closure semantic, and substitute the old source-tree-only Codex link into a plugin-only cache fixture. Every mutation must produce a named validation error.
+
+### Installed bundle and single-source rule
+
+`core/policy.md` and `core/deep-change-checklist.md` remain canonical. The Codex package now ships exact renderings at `skills/careful-workflow/references/core-contract.md` and `skills/careful-workflow/references/deep-change-checklist.md`. Self-hosting requires byte-for-byte equality with the canonical files and validates references from a package-only root. The final structural run was:
+
+```text
+$ python3 -m unittest tests.test_validate_deep_change_contract -v
+Ran 5 tests in 0.210s
+OK
+$ python3 scripts/validate_self_hosting.py
+Careful self-hosting validation passed
+```
+
+### Installed-package behavioral method
+
+Every run below used a separate copy containing only the installed `plugins/careful/` subtree; there was no repository-level `core/`, `openspec/`, `.careful/`, project guidance, or project profile. Runs used `gpt-5.6-sol` with:
+
+```text
+codex exec --ephemeral --ignore-user-config --ignore-rules --skip-git-repo-check -s read-only -m gpt-5.6-sol --json -o <output> -C <plugin-only-root> '<exact input below>'
+```
+
+The packaged policy and checklist hashes were identical in every run:
+
+- `skills/careful-workflow/references/core-contract.md`: `b04b97befe53ca28ce3216707fb2daf013b1ec5693f98328f3355d5639e5da17`
+- `skills/careful-workflow/references/deep-change-checklist.md`: `f77ed08425b5e2587b1309f8b2f5a0683e95e898594822d66b2bac9078266ad6`
+
+The review, predecessor, unavailable-review, override, minor-boundary, and non-distribution RED runs used workflow hash `f0c59ccaefde02f24467f2d5ee9fdbce48a28f17563c6ab9f2fa27440a809207`. The non-distribution RED justified a minimal conditional-routing correction. The final distribution and non-distribution GREEN runs used workflow hash `e7d91ad3ed70e69bd0e5103d0d96e7b1fb0eeddf3a2a6e08678e84d7a40e10d1`; that sentence is the only behavioral artifact difference.
+
+### Distribution trigger, final GREEN
+
+Run identity: `019fd283-a442-7620-accf-61250bc401a4` (2026-08-05T15:21:10Z). Result: PASS. The reviewer read the packaged checklist.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts. Respond with the review outcome and any necessary next actions: An approved Deep change introduces a repository initializer for a multi-harness tool. Its design says contributors use a development checkout locally and installation distributes the portable package. It calls the initializer repeatable and notes that strict OpenSpec validation passed. The author asks to begin implementation today. Decide whether the change can move forward. State only the artifacts you read, necessary next actions, and handoff status.
+```
+
+Complete final answer:
+
+```text
+Artifacts read
+
+- Decision record supplied in the request
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+- `skills/careful-workflow/references/deep-change-checklist.md`
+
+Necessary next actions
+
+- Complete the mandatory pre-implementation Deep checklist with concrete repository evidence for:
+  - Bootstrap and discovery
+  - Consumer paths and reference resolution in development and installed layouts
+  - Cloneable source and immutable version
+  - Interactive, dry-run, and non-interactive behavior
+  - Ownership and version-control treatment of created state
+  - Upgrade, repair, migration, rollback, repeat-run, and destructive boundaries
+- Re-review the completed checklist before implementation. Approval, repeatability claims, and successful strict OpenSpec validation do not replace it.
+
+Handoff status
+
+**BLOCKED: Do not begin implementation today.** The required portable Deep change checklist is incomplete, leaving material distribution and initializer behavior unspecified. Implementation may proceed after the checklist is completed and reviewed.
+```
+
+### Review closure, installed package
+
+Run identity: `019fd27f-f910-74f0-91d6-59cf0eae4e1a` (2026-08-05T15:17:10Z). Result: PASS.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts. Respond with the review outcome and any necessary handoff language: An independent review of a Deep specification identified a material problem with a compatibility claim. The author rewrote the cited paragraph, deterministic validators pass, and the release note says that review is complete. Time is short. Assess the stated outcome and state only the artifacts you read and required handoff language.
+```
+
+Complete final answer:
+
+```text
+Outcome: **Review incomplete.** Rewriting the paragraph and passing deterministic validators do not close a material Deep-review finding. The corrected specification requires a new independent review with no material actionable findings.
+
+Required handoff language: **Independent review of the corrected artifact is unavailable; residual compatibility risk remains. Do not claim clean closure or that review is complete.**
+
+Artifacts read:
+
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+```
+
+### Active predecessor no-regression, installed package
+
+Run identity: `019fd280-64a0-7900-9059-f9b8e1909540` (2026-08-05T15:17:37Z). Result: PASS. No predecessor guidance was added.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts. Respond with the outcome and any necessary durable record: Two active OpenSpec changes validate strictly. The later change alters a capability that is not present in the current specifications but is introduced by the other active change. The later change metadata has no relationship to the other change. Its author asks to archive it now. Decide the outcome and state only the artifacts you read and any required durable record.
+```
+
+Complete final answer:
+
+```text
+**Outcome — BLOCKED:** Do not archive the later change yet. Strict validation does not establish archive safety; its modified capability exists only through an undeclared active predecessor.
+
+**Required durable record:** Record the other active change as the later change’s predecessor/dependency in its metadata, then archive in dependency order. The packaged artifacts do not specify the metadata field syntax.
+
+**Artifacts read:**
+
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+```
+
+### Non-distribution conditional loading, RED and GREEN
+
+Exact reviewer input for both runs:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts: A Deep change revises an in-memory ranking algorithm and its tests. It changes no command, installer, package or plugin distribution, symlink or submodule layout, generated project guidance, or shared filesystem artifact. The durable design and ordinary Deep review plan are complete. Decide whether the distribution checklist is required before implementation. State only the artifacts you read, outcome, and necessary next actions.
+```
+
+RED run identity: `019fd280-ee7f-7850-99b4-2cde69fb38c5` (2026-08-05T15:18:12Z). It reached the correct outcome but unnecessarily loaded the checklist:
+
+```text
+- Artifacts read: `skills/careful-workflow/SKILL.md`; `skills/careful-workflow/references/core-contract.md`; `skills/careful-workflow/references/deep-change-checklist.md`.
+- Outcome: **Verified** — the distribution checklist is not required because the change affects none of its triggering distribution or shared-artifact categories.
+- Necessary next actions: Proceed with implementation and the planned ordinary Deep verification and independent review.
+```
+
+The minimal correction added an explicit ordinary-Deep/core-only route when no distribution surface changes.
+
+GREEN run identity: `019fd283-4fbc-7542-bf1a-4221e9228d03` (2026-08-05T15:20:48Z). Result: PASS. The reviewer did not load the checklist:
+
+```text
+Artifacts read:
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+
+Outcome:
+- **Verified:** The distribution checklist is not required. None of its triggering surfaces changes.
+
+Necessary next actions:
+- Proceed with ordinary Deep implementation controls.
+- After implementation, verify tests and obtain independent specification-compliance and code-quality reviews.
+```
+
+### Unavailable independent review
+
+Run identity: `019fd281-b158-72d3-8788-85b7c86f5e4e` (2026-08-05T15:19:02Z). Result: PASS.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts: A material compatibility finding in a Deep specification was corrected. Deterministic validators pass, but the host cannot run an independent reviewer before today’s handoff. No override was given. Provide the required handoff outcome, recovery path, and residual-risk language. State only the artifacts you read and the handoff.
+```
+
+Complete final answer:
+
+```text
+Artifacts read:
+
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+- `skills/careful-workflow/agents/openai.yaml`
+
+Handoff:
+
+- **Outcome:** Deep change is not cleanly closed and must not be represented as fully approved.
+- **Verified evidence:** The material compatibility finding was corrected; deterministic validators pass.
+- **Non-goal:** This handoff does not waive or substitute for independent review.
+- **Review status:** Independent review of the corrected artifact was unavailable on this host. No override accepted that risk.
+- **Recovery path:** Run an independent review of the corrected artifact on a capable host, covering specification compliance and code/product quality. Clean closure requires a pass with no material actionable findings.
+- **Residual risk:** The correction may still contain compatibility or product-quality defects that deterministic validation did not detect.
+- **Decision required:** Do not treat the change as cleanly closed until review passes; any earlier acceptance requires an explicit override recording rationale and accepted risk.
+- **Documentation impact:** **Unknown** from the provided record.
+- **Retrospective:** The material finding and unavailable rereview are high-signal candidates; assess improvements, but apply none automatically.
+- **Degraded control:** Required independent-review execution was unavailable.
+```
+
+### Accepted override and residual risk
+
+Run identity: `019fd282-69a7-7d81-bd93-95de0d128eb2` (2026-08-05T15:19:49Z). Result: PASS.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts: A material compatibility finding in a Deep specification was corrected, but an independent re-review is unavailable today. The user explicitly overrides the review block because an external deadline cannot move and accepts the risk that the compatibility claim may still be wrong. Provide the required outcome and handoff record. State only the artifacts you read and the handoff.
+```
+
+Complete final answer:
+
+```text
+Artifacts read
+
+- `skills/careful-workflow/SKILL.md`
+- `skills/careful-workflow/references/core-contract.md`
+
+Handoff
+
+- **Outcome — Verified:** Proceed under the user’s explicit override. Do not claim clean closure.
+- **Deliberate non-goal:** Certifying the corrected compatibility claim as independently validated.
+- **Evidence — Verified:** A material Deep-specification compatibility finding was corrected; independent re-review is unavailable today; the external deadline cannot move.
+- **Material uncertainty — Unknown:** The corrected compatibility claim may still be wrong.
+- **Review and residual risk:** Re-review remains outstanding. The user accepts the risk of releasing with a potentially incorrect compatibility claim. Obtain independent review of the corrected artifact when available.
+- **Decision required:** None; the user explicitly authorized the override.
+- **Documentation impact:** Record the override rationale, unavailable re-review, accepted residual risk, and pending review without representing the finding as resolved.
+- **Retrospective:** High-signal candidates are reviewer availability before fixed deadlines and contingency planning after material findings. No learning is applied automatically.
+- **Degraded control:** Required independent Deep re-review was unavailable before the deadline.
+```
+
+### Minor-finding boundary
+
+Run identity: `019fd282-e465-7922-9615-03705ba2fa4b` (2026-08-05T15:20:21Z). Result: PASS.
+
+Exact reviewer input:
+
+```text
+You are a fresh, read-only reviewer in an isolated installed Codex plugin package. Do not use sources outside this directory, do not browse, and do not edit files. Read skills/careful-workflow/SKILL.md and follow its packaged references only when applicable. Evaluate this decision record using only those artifacts: A Deep specification and implementation already passed independent specification-compliance and code/product-quality reviews with no material actionable findings. Afterward, the author corrected one misspelled word in a private explanatory sentence; it changes no requirement, public contract, architecture, security or privacy boundary, compatibility claim, migration behavior, or verification conclusion. Decide whether that minor correction resets clean closure and requires another independent pass solely for this correction. State only the artifacts you read, outcome, and necessary next action.
+```
+
+Complete final answer:
+
+```text
+Artifacts read: `skills/careful-workflow/SKILL.md`; `skills/careful-workflow/references/core-contract.md`.
+
+Outcome: Clean closure is not reset. The non-material spelling correction does not require another independent pass.
+
+Necessary next action: None.
+```

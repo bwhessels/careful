@@ -10,7 +10,7 @@
 
 ## Distribution contract
 
-Include this section only for commands, initializers, installers, packaging, generated guidance, or shared filesystem artifacts. Complete every field with a decision or a `Not applicable` statement followed by concrete repository evidence.
+Include this section only for a command, initializer, installer, package or plugin distribution, symlink or submodule layout, generated project guidance, or shared filesystem artifact. Complete every field with a decision or a `Not applicable` statement followed by concrete repository evidence.
 
 - Bootstrap and discovery:
 - Consumer path and reference resolution:

@@ -19,7 +19,7 @@ Treat an explicit user request for Quick or Deep as authoritative. Otherwise sel
 
 Use OpenSpec only for Deep work or when the change needs durable requirements/history. For an initialized project, use its configured schema. Otherwise offer initialization once the user accepts a durable change.
 
-For a Deep change affecting commands, installation, distribution, generated project guidance, or shared filesystem artifacts, read and complete the [portable Deep change checklist](../../../../core/deep-change-checklist.md) before implementation.
+Route the Deep distribution check from the request and repository evidence: when a Deep change affects commands, installation, distribution, generated project guidance, or shared filesystem artifacts, read and complete the [portable Deep change checklist](references/deep-change-checklist.md) before implementation. When none of those surfaces changes, continue with ordinary Deep controls using the core contract.
 
 ## Work loop
 
