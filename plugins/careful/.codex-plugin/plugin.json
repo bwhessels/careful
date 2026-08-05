@@ -1,6 +1,6 @@
 {
   "name": "careful",
-  "version": "0.2.0",
+  "version": "0.2.0+codex.20260805161407",
   "description": "Careful's evidence-led Codex adapter.",
   "author": {
     "name": "Careful"
@@ -12,7 +12,10 @@
     "longDescription": "Careful's Codex adapter applies the portable evidence, proportional review, documentation-impact, and learning workflow to Codex work.",
     "developerName": "Careful",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "defaultPrompt": "Use Careful to build this safely."
   }
 }
