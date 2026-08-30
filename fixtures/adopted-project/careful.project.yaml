@@ -1,0 +1,9 @@
+version: 1
+project:
+  name: adopted-project-fixture
+  maturity: adopted
+documentation:
+  specs: openspec/specs/
+  changes: openspec/changes/
+  spec_authority: openspec
+  execution_plans: docs/superpowers/plans/

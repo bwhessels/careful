@@ -6,6 +6,7 @@
 | --- | --- |
 | User-facing intent and depth selection | Careful workflow |
 | Durable requirements, deltas, designs, and history | OpenSpec |
+| Execution plans and task sequencing | Project-configured execution-plan location, linked to OpenSpec |
 | Execution discipline, testing, debugging, and review | Careful skills / Codex agents |
 | Deterministic checks | Project tooling and CI |
 | Portable policy | `core/policy.md` |

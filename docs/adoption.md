@@ -10,6 +10,10 @@ Careful has one portable policy in `core/policy.md`. Keep it as the canonical so
 4. Keep personal notes, product context, and local event records in `.careful/`; add it to `.gitignore`.
 5. Select only the adapters used in that project.
 
+Declare the project’s durable specification authority in `documentation.spec_authority` and its execution-plan location in `documentation.execution_plans`. When OpenSpec is declared, keep proposals, designs, requirements, tasks, and history under `openspec/`; execution plans must link to those artifacts. During adoption, report competing durable-looking specification paths and ask before migrating them.
+
+If the project is intended for external publication, configure `public_readiness` with its audience mode, required documents, project checks, and first-publication/release gates. Careful validates the objective parts; owners remain responsible for license, privacy, security-disclosure, support, and publication decisions.
+
 ## Codex
 
 Install `careful@careful` from this repository's marketplace. Keep `AGENTS.md` tracked, then start a fresh Codex thread. The current plugin path remains supported for this compatibility release.

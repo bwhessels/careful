@@ -9,7 +9,9 @@ After installation and project adoption, Careful applies a default Standard work
 - Labels meaningful claims as verified, inferred, assumed, or unknown.
 - Challenges consequential decisions and blocks only with material evidence, a recommendation, and an override path.
 - Uses OpenSpec as the durable record for Deep changes.
+- Resolves a project-declared specification authority so durable specs are not duplicated across OpenSpec and execution-planning folders.
 - Updates documentation through an impact assessment rather than a separate manual chore.
+- Supports project-specific public-readiness checks and publication/release review gates.
 - Runs retrospectives after high-signal work and proposes—not silently applies—improvements.
 
 ## Structure

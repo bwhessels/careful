@@ -21,6 +21,18 @@ documentation:
   decisions: docs/architecture/decisions/
   development: docs/development/
   reference: docs/reference/
+  spec_authority: openspec
+  execution_plans: docs/superpowers/plans/
+
+public_readiness:
+  audience: internal
+  required_documents:
+    - README.md
+  checks:
+    - npm test
+  gates:
+    first_publication: independent-review
+    release: independent-review
 
 careful:
   adapters:

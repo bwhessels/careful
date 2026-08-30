@@ -34,6 +34,8 @@ Route the Deep distribution check from the request and repository evidence: when
 9. Before finalizing, assess retrospective signals: blocks, overrides, material review findings, failed verification, repeated rework, and durable user corrections. Report no high-signal candidate or present concise evidence-backed candidates. Do not require a retrospective command for this baseline check.
 10. Provide the final handoff in the format in the [portable core contract](references/core-contract.md), including documentation-impact and retrospective-assessment results when applicable.
 
+Before creating a durable proposal, design, requirements document, or change record, resolve the project’s declared specification authority. When `documentation.spec_authority: openspec` is present, use OpenSpec for durable artifacts and use the configured execution-plan location only for linked implementation plans. Do not create a parallel durable specification under `docs/superpowers/specs/`; report an existing competing document for owner review instead of migrating it silently.
+
 ## Special entry points
 
 - For exploration, do not implement. Use the OpenSpec explore stance: investigate, challenge framing, and identify unknowns.

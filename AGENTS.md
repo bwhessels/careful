@@ -4,6 +4,8 @@ Treat this repository as the source of truth for Careful, the shareable coding-a
 
 The portable workflow policy is [core/policy.md](core/policy.md). Keep host-specific discovery and permissions in `adapters/`; do not duplicate shared policy in adapter files.
 
+OpenSpec is the sole durable specification authority for Careful. Store proposals, designs, requirements, tasks, and change history under `openspec/`; use `docs/superpowers/plans/` only for execution plans that link back to OpenSpec. Do not create or maintain a parallel durable specification under `docs/superpowers/specs/`.
+
 ## Careful workflow
 
 When the Careful plugin is installed, use `$careful-workflow` for substantive product, coding, debugging, and architecture tasks. Let it select Quick, Standard, or Deep depth; do not require a Careful command for normal work.

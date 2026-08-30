@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 
 from validate_change_dependencies import validate_change_dependencies
+from validate_public_readiness import validate_public_readiness
+from validate_spec_authority import validate_spec_authority
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -228,6 +230,12 @@ def main() -> None:
     dependency_errors = validate_change_dependencies(ROOT)
     require(not dependency_errors, "\nFAIL: ".join(dependency_errors))
 
+    authority_errors = validate_spec_authority(ROOT)
+    require(not authority_errors, "\nFAIL: ".join(authority_errors))
+
+    public_readiness = validate_public_readiness(ROOT)
+    require(not public_readiness["failed_checks"], "\nFAIL: ".join(public_readiness["failed_checks"]))
+
     deep_contract_errors = validate_deep_change_contract(ROOT)
     require(not deep_contract_errors, "\nFAIL: ".join(deep_contract_errors))
 
@@ -317,6 +325,10 @@ def main() -> None:
         fixture_root = ROOT / "fixtures" / "adopted-project" / fixture
         require((fixture_root / "AGENTS.md").is_file(), f"missing {fixture} fixture guidance")
         require((fixture_root / "README.md").is_file(), f"missing {fixture} fixture documentation")
+    fixture_root = ROOT / "fixtures" / "adopted-project"
+    require((fixture_root / "careful.project.yaml").is_file(), "missing adopted-project fixture profile")
+    fixture_authority_errors = validate_spec_authority(fixture_root)
+    require(not fixture_authority_errors, "\nFAIL: ".join(fixture_authority_errors))
     require((ROOT / "fixtures" / "adopted-project" / "SCENARIO.md").is_file(), "missing common fixture scenario")
 
     deep_design = (ROOT / "examples" / "openspec-schemas" / "critical-deep" / "templates" / "design.md").read_text()

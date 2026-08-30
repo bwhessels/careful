@@ -5,6 +5,8 @@ project:
 
 commands:
   validate_change_dependencies: python3 scripts/validate_change_dependencies.py
+  validate_spec_authority: python3 scripts/validate_spec_authority.py
+  validate_public_readiness: python3 scripts/validate_public_readiness.py
   validate_self_hosting: python3 scripts/validate_self_hosting.py
   validate_specs: openspec validate --specs
 
@@ -20,6 +22,8 @@ documentation:
   changes: openspec/changes/
   architecture: docs/design.md
   development: AGENTS.md
+  spec_authority: openspec
+  execution_plans: docs/superpowers/plans/
 
 self_hosting:
   distributable_adapters:
