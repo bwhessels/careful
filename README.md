@@ -30,6 +30,10 @@ Codex is the verified static adapter. Claude Code and Factory Droid adapters are
 
 Contributions are welcome through GitHub pull requests. The `main` branch is protected: changes require review and approval from the project maintainer before merging. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution and validation workflow.
 
+## License
+
+[MIT](LICENSE)
+
 ## Try it locally
 
 For Codex, clone this repository, add it as a local marketplace, then install the plugin:
