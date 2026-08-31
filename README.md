@@ -14,6 +14,17 @@ After installation and project adoption, Careful applies a default Standard work
 - Supports project-specific public-readiness checks and publication/release review gates.
 - Runs retrospectives after high-signal work and proposes—not silently applies—improvements.
 
+## Why Careful is different
+
+Careful is designed to make the reasoning around a change inspectable:
+
+- **Evidence before confidence.** Important claims are labeled as verified, inferred, assumed, or unknown, so gaps are visible instead of being hidden behind confident prose.
+- **Proportional controls.** Quick, Standard, and Deep workflows match the amount of scrutiny to the risk. A README fix does not need the same process as a security, privacy, architecture, or public-contract change.
+- **Useful blocks.** When a decision lacks evidence or could cause material harm, Careful can stop with the reason, evidence, recommended path, and explicit override route.
+- **One durable record.** Projects choose one specification authority—OpenSpec for this repository—while execution plans remain plans. That prevents requirements and decisions from drifting across competing documents.
+- **Documentation follows impact.** Careful routes behavior, architecture, contributor, operational, and public-contract facts to their canonical documents instead of treating documentation as an after-the-fact chore.
+- **Honest portability.** Host adapters provide discovery and control mechanics, while fixtures and capability reporting distinguish verified behavior from static or experimental support.
+
 ## Structure
 
 - `core/` — canonical portable workflow policy and adapter manifest.
