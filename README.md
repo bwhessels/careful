@@ -22,9 +22,17 @@ After installation and project adoption, Careful applies a default Standard work
 - `examples/` — portable project-profile and OpenSpec schema examples.
 - `docs/` — design notes for the harness itself.
 
-## Status
+## Status and scope
 
-Codex is the verified static adapter. Claude Code and Factory Droid adapters are experimental until their authenticated fresh-session fixtures are recorded. Careful intentionally excludes workplace governance, hosted control planes, centralized telemetry, and automatic mutation of user projects.
+Careful is a maintainer-led, experimental project. Codex is the verified static adapter; Claude Code and Factory Droid adapters are experimental until their authenticated fresh-session fixtures are recorded. Careful intentionally excludes workplace governance, hosted control planes, centralized telemetry, and automatic mutation of user projects. Passing repository checks does not certify a project’s public documentation, legal posture, security process, or production readiness.
+
+The canonical documentation is split by purpose:
+
+- [Adoption](docs/adoption.md) — install and add Careful to a project.
+- [Compatibility](docs/compatibility.md) — adapter status and verification claims.
+- [Release](docs/release.md) — maintainer validation and release procedure.
+- [Contributing](CONTRIBUTING.md) — contributor workflow and checks.
+- [License](LICENSE) — MIT license terms.
 
 ## Contributing
 
@@ -39,13 +47,11 @@ Contributions are welcome through GitHub pull requests. The `main` branch is pro
 For Codex, clone this repository, add it as a local marketplace, then install the plugin:
 
 ```bash
-git clone https://github.com/<OWNER>/careful.git
+git clone https://github.com/bwhessels/careful.git
 cd careful
 codex plugin marketplace add "$PWD"
 codex plugin add careful@careful
 ```
-
-Replace `<OWNER>` with the GitHub account or organization that publishes Careful.
 
 Start a new Codex thread after installation. The workflow skill should activate for substantive product and coding work; use `$careful-adopt` when onboarding a project and `$careful-retrospective` for an explicit learning pass.
 

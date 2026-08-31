@@ -25,6 +25,22 @@ documentation:
   spec_authority: openspec
   execution_plans: docs/superpowers/plans/
 
+public_readiness:
+  audience: public-intended
+  required_documents:
+    - README.md
+    - LICENSE
+  checks:
+    - python3 -m unittest discover -s tests -v
+    - python3 scripts/validate_change_dependencies.py
+    - python3 scripts/validate_spec_authority.py
+    - python3 scripts/validate_public_readiness.py
+    - python3 scripts/validate_self_hosting.py
+    - openspec validate --all --strict --no-interactive
+  gates:
+    first_publication: maintainer-review
+    release: maintainer-review
+
 self_hosting:
   distributable_adapters:
     - plugins/careful/

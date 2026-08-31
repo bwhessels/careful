@@ -1,0 +1,50 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Test and validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js for OpenSpec
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pinned OpenSpec CLI
+        run: npm install --global openspec@1.6.0
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Validate change dependencies
+        run: python3 scripts/validate_change_dependencies.py
+
+      - name: Validate specification authority
+        run: python3 scripts/validate_spec_authority.py
+
+      - name: Validate public readiness
+        run: python3 scripts/validate_public_readiness.py
+
+      - name: Validate self-hosting
+        run: python3 scripts/validate_self_hosting.py
+
+      - name: Validate OpenSpec artifacts
+        run: openspec validate --all --strict --no-interactive

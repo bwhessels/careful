@@ -86,6 +86,18 @@ class ValidatePublicReadinessTests(unittest.TestCase):
         self.assertEqual(result["status"], "fail")
         self.assertEqual(result["failed_checks"], ["unsupported public_readiness.audience: everyone"])
 
+    def test_careful_declares_lightweight_public_readiness_without_security_document(self):
+        repository_root = Path(__file__).resolve().parents[1]
+
+        profile = parse_public_readiness(repository_root / "careful.project.yaml")
+        result = validate_public_readiness(repository_root)
+
+        self.assertEqual(profile["audience"], "public-intended")
+        self.assertEqual(profile["required_documents"], ["README.md", "LICENSE"])
+        self.assertNotIn("SECURITY.md", profile["required_documents"])
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["failed_checks"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,12 +12,16 @@ Thanks for considering a contribution. Careful is intentionally small and opinio
    ```bash
    python3 -m unittest discover -s tests -v
    python3 scripts/validate_change_dependencies.py
+   python3 scripts/validate_public_readiness.py
+   python3 scripts/validate_spec_authority.py
    python3 scripts/validate_self_hosting.py
    python3 /path/to/plugin-creator/scripts/validate_plugin.py plugins/careful
    openspec validate --all --strict --no-interactive
    ```
 
 5. Open a pull request using the template and describe the motivation, trade-offs, validation, and any documentation impact.
+
+For this maintainer-led project, the configured public-readiness gate is a lightweight maintainer review. It checks that public orientation, status and limitation claims, the MIT license, and documentation impact remain accurate. It is not independent review or formal certification.
 
 OpenSpec's generated `.codex/skills/` wrappers are local development convenience files and are intentionally ignored. The tracked `openspec/` artifacts and the OpenSpec CLI are the contributor-facing source of truth.
 
