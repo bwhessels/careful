@@ -10,11 +10,19 @@ from pathlib import Path
 from validate_change_dependencies import validate_change_dependencies
 from validate_public_readiness import validate_public_readiness
 from validate_spec_authority import validate_spec_authority
+from careful_assessment import analyze_change_impact, validate_evidence_ledger
 
 
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "plugins" / "careful"
 SKILLS = ("careful-workflow", "careful-documentation", "careful-retrospective", "careful-adopt")
+ASSESSMENT_SCRIPTS = (
+    ROOT / "scripts" / "careful_assessment.py",
+    ROOT / "scripts" / "validate_evidence_ledger.py",
+    ROOT / "scripts" / "analyze_change_impact.py",
+    ROOT / "scripts" / "assess_careful.py",
+    ROOT / "scripts" / "review_codebase_hygiene.py",
+)
 CORE = ROOT / "core"
 ADAPTERS = {
     "claude-code": ROOT / "adapters" / "claude-code",
@@ -239,6 +247,16 @@ def main() -> None:
     deep_contract_errors = validate_deep_change_contract(ROOT)
     require(not deep_contract_errors, "\nFAIL: ".join(deep_contract_errors))
 
+    fixture_root = ROOT / "fixtures" / "adopted-project"
+    fixture_ledger = validate_evidence_ledger(fixture_root)
+    require(fixture_ledger["status"] == "pass", "consumer fixture evidence ledger failed")
+    fixture_impact = analyze_change_impact(fixture_root, ["README.md", "AGENTS.md"])
+    require(
+        any(item["surface"] == "public-documentation" for item in fixture_impact["findings"]),
+        "consumer fixture impact analysis missed public documentation",
+    )
+    print("Consumer fixture assessment validation passed")
+
     policy = CORE / "policy.md"
     deep_change_checklist = CORE / "deep-change-checklist.md"
     manifest_file = CORE / "adapter-manifest.yaml"
@@ -262,6 +280,8 @@ def main() -> None:
     manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text())
     require(manifest["name"] == "careful", "plugin manifest must be named careful")
     require(manifest["skills"] == "./skills/", "plugin must expose its skills directory")
+    for script in ASSESSMENT_SCRIPTS:
+        require(script.is_file(), f"missing assessment implementation: {script.relative_to(ROOT)}")
 
     for skill in SKILLS:
         skill_file = PLUGIN / "skills" / skill / "SKILL.md"
@@ -275,6 +295,7 @@ def main() -> None:
     require("retrospective signals" in workflow, "workflow must own baseline retrospective checks")
     require("careful.project.yaml" in workflow, "workflow must discover the self-hosting profile")
     require("deep-change-checklist.md" in workflow, "Codex workflow must reference the portable Deep change checklist")
+    require("autonomous evidence, change-impact, and codebase-hygiene assessment" in workflow, "workflow must run autonomous assessment")
 
     ignore = (ROOT / ".gitignore").read_text()
     require(".careful/" in ignore, "private .careful context must be ignored")

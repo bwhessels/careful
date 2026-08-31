@@ -2,12 +2,14 @@
 
 1. Run `python3 -m unittest discover -s tests -v`, `python3 scripts/validate_change_dependencies.py`, `python3 scripts/validate_self_hosting.py`, and `openspec validate --all --strict --no-interactive`.
 2. Run `python3 scripts/validate_spec_authority.py` and `python3 scripts/validate_public_readiness.py` for the project being released. Resolve or explicitly record any authority conflict; do not treat a passing mechanical check as semantic public-readiness approval.
-3. Run the skill validator separately for every changed skill directory, then validate the complete Codex plugin with the plugin validator.
-4. Run static validation for every adapter and compare it against `core/adapter-manifest.yaml`.
-5. For changed workflow guidance, record the blind baseline and fresh-context forward pressure scenarios in the change evidence.
-6. For this maintainer-led Careful project, perform the configured lightweight maintainer review: confirm README accuracy, public claims, visible limitations, MIT license presence, and documentation impact. Do not describe this review as independent review or formal certification. The portable Deep contract still governs any change that claims clean independent-review closure.
-7. Install or reinstall each changed adapter using its documented installation boundary.
-8. Start a new session in every affected host before evaluating updated skills. Existing sessions retain already-loaded instruction context and cannot prove the new behavior.
+3. Run `python3 scripts/validate_evidence_ledger.py` and `python3 scripts/assess_careful.py --depth deep` when assessment is configured. Resolve material findings or record explicit residual-risk decisions; routine verification findings should be handled by the workflow without requiring the release owner to manually audit them.
+4. Run `python3 scripts/review_codebase_hygiene.py` as part of independent code/product-quality review. Treat placeholder and important findings as actionable; treat large-file, duplication, and unused-code results as evidence-backed candidates requiring reviewer judgment, not proof of defects or cleanliness.
+5. Run the skill validator separately for every changed skill directory, then validate the complete Codex plugin with the plugin validator.
+6. Run static validation for every adapter and compare it against `core/adapter-manifest.yaml`.
+7. For changed workflow guidance, record the blind baseline and fresh-context forward pressure scenarios in the change evidence.
+8. For this maintainer-led Careful project, perform the configured lightweight maintainer review: confirm README accuracy, public claims, visible limitations, MIT license presence, and documentation impact. Do not describe this review as independent review or formal certification. The portable Deep contract still governs any change that claims clean independent-review closure.
+9. Install or reinstall each changed adapter using its documented installation boundary.
+10. Start a new session in every affected host before evaluating updated skills. Existing sessions retain already-loaded instruction context and cannot prove the new behavior.
 
 The adopted-project fixture variants are consumer checks. They must be validated separately from source-repository checks whenever shared policy, adapter behavior, skill triggers, schemas, or installation guidance changes. Do not release an adapter as verified until its fresh-session fixture evidence is recorded. Passing deterministic, skill, and plugin validators proves structure; it does not replace pressure scenarios, independent review, reinstall, or fresh-session consumer evidence.
 

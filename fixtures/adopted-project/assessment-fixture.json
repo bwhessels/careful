@@ -1,0 +1,10 @@
+{
+  "changed_paths": [
+    "AGENTS.md",
+    "core/policy.md",
+    "README.md"
+  ],
+  "expected_material_surfaces": [
+    "public-documentation"
+  ]
+}

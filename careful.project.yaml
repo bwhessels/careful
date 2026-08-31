@@ -9,6 +9,10 @@ commands:
   validate_public_readiness: python3 scripts/validate_public_readiness.py
   validate_self_hosting: python3 scripts/validate_self_hosting.py
   validate_specs: openspec validate --specs
+  validate_evidence_ledger: python3 scripts/validate_evidence_ledger.py
+  analyze_change_impact: python3 scripts/analyze_change_impact.py
+  assess_careful: python3 scripts/assess_careful.py
+  review_codebase_hygiene: python3 scripts/review_codebase_hygiene.py
 
 risk_boundaries:
   - adapter_contract
@@ -40,6 +44,20 @@ public_readiness:
   gates:
     first_publication: maintainer-review
     release: maintainer-review
+
+assessment:
+  ledger: evidence/ledger.json
+  fail_on_unknown: false
+  required_surfaces:
+    - durable-specification
+    - public-documentation
+  mappings:
+    - pattern: plugins/careful/
+      surface: codex-adapter
+      required: true
+    - pattern: adapters/
+      surface: cross-harness-adapters
+      required: true
 
 self_hosting:
   distributable_adapters:

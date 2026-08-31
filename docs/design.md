@@ -9,6 +9,7 @@
 | Execution plans and task sequencing | Project-configured execution-plan location, linked to OpenSpec |
 | Execution discipline, testing, debugging, and review | Careful skills / Codex agents |
 | Deterministic checks | Project tooling and CI |
+| Autonomous claim and impact assessment | Careful assessment engine and project-configured checks |
 | Portable policy | `core/policy.md` |
 | Triggered Deep distribution checklist | `core/deep-change-checklist.md` |
 | Host discovery and permissions | Adapter-specific files in `plugins/careful/` and `adapters/` |
@@ -17,13 +18,16 @@
 
 ```text
 request → classify depth → inspect evidence → challenge if consequential
-        → implement → documentation impact → independent review when triggered
+        → assess impact/evidence → implement → re-assess → documentation impact
+        → independent review when triggered
         → final handoff → retrospective when high-signal
 ```
 
 OpenSpec owns the current-vs-proposed boundary: main specs describe current observable behavior, while changes capture time-bound deltas, design, tasks, evidence, and history.
 
 The portable policy owns the requirement for a clean independent pass after a material Deep finding is corrected. Adapters only route to that rule. If a clean pass is unavailable or overridden, the handoff carries that fact and the residual risk; it does not describe the review as clean. The definitions and triggered checklist remain canonical in [`core/policy.md`](../core/policy.md) and [`core/deep-change-checklist.md`](../core/deep-change-checklist.md).
+
+Autonomous assessment owns the feedback loop for consequential claims and changed surfaces. It records evidence and mappings, classifies findings, adds verification or escalates when material, and flags only decisions that require the project owner or unavailable external evidence. The ledger and impact report are inputs to that loop, not documents the user must manually audit.
 
 ## Automation policy
 

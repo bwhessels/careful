@@ -34,6 +34,17 @@ public_readiness:
     first_publication: independent-review
     release: independent-review
 
+assessment:
+  ledger: evidence/ledger.json
+  fail_on_unknown: false
+  required_surfaces:
+    - durable-specification
+    - public-documentation
+  mappings:
+    - pattern: src/api/
+      surface: public-api
+      required: true
+
 careful:
   adapters:
     - codex

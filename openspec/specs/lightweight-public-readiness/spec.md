@@ -1,7 +1,8 @@
 # lightweight-public-readiness Specification
 
 ## Purpose
-TBD - created by archiving change complete-lightweight-public-readiness. Update Purpose after archive.
+
+Define Careful’s deliberately lightweight public-readiness posture, including its required public artifacts, objective checks, maintainer review gate, and explicit limitations.
 ## Requirements
 ### Requirement: Careful declares a lightweight public posture
 
@@ -58,4 +59,3 @@ Careful SHALL document that the lightweight public-readiness posture does not es
 - **WHEN** they assess project maturity or support expectations
 - **THEN** the documentation identifies Careful as maintainer-led and experimental where applicable
 - **AND** does not imply that omitted governance artifacts or security processes exist
-

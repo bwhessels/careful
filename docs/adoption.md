@@ -14,6 +14,8 @@ Declare the project’s durable specification authority in `documentation.spec_a
 
 If the project is intended for external publication, configure `public_readiness` with its audience mode, required documents, project checks, and first-publication/release gates. Careful validates the objective parts; owners remain responsible for license, privacy, security-disclosure, support, and publication decisions.
 
+Projects may configure `assessment` with a project-local `ledger`, `required_surfaces`, and explicit `mappings`. Careful runs assessment automatically around substantive work, resolves routine findings itself, and flags only material owner decisions or unavailable evidence. The ledger and reports are non-destructive and do not replace the declared specification authority.
+
 ## Codex
 
 Install `careful@careful` from this repository's marketplace. Keep `AGENTS.md` tracked, then start a fresh Codex thread. The current plugin path remains supported for this compatibility release.

@@ -13,6 +13,7 @@ After installation and project adoption, Careful applies a default Standard work
 - Updates documentation through an impact assessment rather than a separate manual chore.
 - Supports project-specific public-readiness checks and publication/release review gates.
 - Runs retrospectives after high-signal work and proposes—not silently applies—improvements.
+- Audits its own evidence and change impact, resolves routine findings automatically, and flags only material decisions or missing external evidence.
 
 ## Why Careful is different
 

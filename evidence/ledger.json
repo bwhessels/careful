@@ -1,0 +1,27 @@
+{
+  "records": [
+    {
+      "id": "careful-open-spec-validation",
+      "claim": "Careful's tracked OpenSpec changes pass strict validation.",
+      "classification": "Verified",
+      "evidence": [
+        {
+          "kind": "command",
+          "ref": "openspec validate --all --strict --no-interactive",
+          "observed": "2026-08-31"
+        }
+      ],
+      "scope": {"paths": ["openspec/"]},
+      "status": "current"
+    },
+    {
+      "id": "careful-claude-fresh-session",
+      "claim": "Claude Code automatically activates the updated Careful workflow in a fresh authenticated session.",
+      "classification": "Unknown",
+      "evidence": [],
+      "reason": "The compatibility record still identifies authenticated fresh-session evidence as pending.",
+      "scope": {"adapters": ["claude-code"]},
+      "status": "current"
+    }
+  ]
+}

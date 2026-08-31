@@ -7,3 +7,6 @@ documentation:
   changes: openspec/changes/
   spec_authority: openspec
   execution_plans: docs/superpowers/plans/
+assessment:
+  ledger: evidence-ledger.json
+  fail_on_unknown: false

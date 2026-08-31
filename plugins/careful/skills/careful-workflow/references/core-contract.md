@@ -14,6 +14,10 @@ For substantive product, coding, debugging, and architecture work, select one de
 
 For consequential claims, use only these labels: **Verified**, **Inferred**, **Assumption**, and **Unknown**. Research time-sensitive or consequential external claims and do not overstate sources.
 
+Careful SHALL assess its own consequential claims and change-impact findings. It SHALL use assessment outcomes to add verification, escalate workflow depth, block completion, or continue without interruption. It SHALL flag the user only for material findings requiring owner judgment, authorization, external evidence, or explicit residual-risk acceptance; routine satisfied findings remain internal workflow state.
+
+Independent code/product-quality review SHALL include a structural hygiene pass covering unnecessary complexity or boilerplate, AI-generated filler, duplicated logic, likely unused code, oversized files, naming/cohesion issues, and tests that fail to demonstrate behavior. Static hygiene checks SHALL report candidates with evidence and limitations; they SHALL not claim that the absence of findings proves semantic cleanliness or absence of unused behavior.
+
 ## Specification authority
 
 Before creating a durable proposal, design, requirements document, or change record, resolve the project’s specification authority from `careful.project.yaml` or an explicit adoption decision.
@@ -60,6 +64,8 @@ For a Deep change affecting commands, installation, distribution, generated proj
 After correcting a material Deep review finding, obtain an independent review of the corrected artifact. Claim clean closure only after a pass with no material actionable findings; otherwise report unavailable review, residual risk, or an accepted override.
 
 The final handoff states outcome and deliberate non-goals; evidence; material uncertainties; review and residual risk; decisions requiring the user; documentation-impact result; retrospective result; and any unavailable or degraded adapter control.
+
+When autonomous assessment is available, the final handoff summarizes unresolved, blocked, accepted-risk, and user-decision-needed findings rather than requiring the user to audit the complete evidence ledger or impact report.
 
 ## Boundaries
 

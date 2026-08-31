@@ -1,0 +1,26 @@
+{
+  "records": [
+    {
+      "id": "fixture-current",
+      "claim": "The adopted fixture has a current source-repository check.",
+      "classification": "Verified",
+      "evidence": [{"kind": "test", "ref": "tests/test_assessment_fixtures.py"}],
+      "status": "current"
+    },
+    {
+      "id": "fixture-stale",
+      "claim": "The experimental adapter session is current.",
+      "classification": "Verified",
+      "evidence": [{"kind": "fixture", "ref": "fixtures/adopted-project/claude-code"}],
+      "status": "stale",
+      "reason": "The fixture has not been rerun after the workflow update."
+    },
+    {
+      "id": "fixture-unknown",
+      "claim": "The host can provide a fresh authenticated review session.",
+      "classification": "Unknown",
+      "evidence": [],
+      "reason": "Host capability has not been established in this fixture."
+    }
+  ]
+}

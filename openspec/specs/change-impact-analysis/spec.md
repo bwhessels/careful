@@ -1,6 +1,10 @@
 # Change-Impact Analysis
 
-## ADDED Requirements
+## Purpose
+
+Define how Careful maps repository changes to workflow surfaces, assesses the consequences, and flags only material unresolved decisions.
+
+## Requirements
 
 ### Requirement: Impact analysis maps changes to workflow surfaces
 
