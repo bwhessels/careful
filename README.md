@@ -1,5 +1,7 @@
 # Careful
 
+![A pixel-art lantern illuminating a careful path at night](docs/assets/careful-lantern.png)
+
 An evidence-led, multi-harness workflow for exploration, implementation, review, documentation, and learning.
 
 After installation and project adoption, Careful applies a default Standard workflow automatically where the host supports automatic activation. It escalates to Deep work for risky, product, architecture, public-contract, data, security, privacy, reliability, and hard-to-reverse changes. Explicit controls exist, but ordinary requests should not need them.
