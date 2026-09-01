@@ -66,9 +66,36 @@ class AutonomousAssessmentTests(unittest.TestCase):
 
             result = run_assessment(root, "quick", ["src/unknown.yaml"])
 
-        self.assertEqual(result["ledger"]["status"], "pass")
-        self.assertEqual(result["depth"], "quick")
-        self.assertIn("hygiene", result)
+            self.assertEqual(result["ledger"]["status"], "pass")
+            self.assertEqual(result["depth"], "quick")
+            self.assertIn("hygiene", result)
+            self.assertTrue((root / ".careful/assessment-state.json").is_file())
+
+    def test_passed_configured_check_satisfies_material_surface(self):
+        result = assess_findings(
+            {"status": "pass", "records": [], "errors": []},
+            {"findings": [{"surface": "public-api", "classification": "verified", "required": True, "summary": "API changed", "source": "mapping"}]},
+            "standard",
+            {"fail_on_unknown": False},
+            [{"surface": "public-api", "status": "passed"}],
+        )
+        self.assertEqual(result["findings"][0]["state"], "satisfied")
+
+    def test_old_evidence_is_stale_even_when_ledger_says_current(self):
+        result = assess_findings(
+            {"status": "pass", "records": [{"id": "old", "classification": "Verified", "status": "current", "claim": "old", "evidence": [{"kind": "test", "ref": "tests/x.py", "observed": "2020-01-01"}]}], "errors": []},
+            {"findings": []},
+            "standard",
+            {"stale_after_days": 90},
+        )
+        self.assertEqual(result["findings"][0]["state"], "stale")
+
+    def test_conflicting_source_revisions_are_detected(self):
+        records = []
+        for identifier, revision in (("a", "rev-a"), ("b", "rev-b")):
+            records.append({"id": identifier, "classification": "Verified", "status": "current", "claim": "same claim", "evidence": [{"kind": "test", "ref": "tests/x.py", "source_revision": revision}]})
+        result = assess_findings({"status": "pass", "records": records, "errors": []}, {"findings": []}, "standard")
+        self.assertEqual({item["state"] for item in result["findings"]}, {"contradiction"})
 
 
 if __name__ == "__main__":

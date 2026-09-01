@@ -3,9 +3,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shlex
 import subprocess
 from dataclasses import asdict, dataclass, field
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -121,6 +124,10 @@ def load_project_assessment_config(path: Path) -> dict[str, Any]:
         "fail_on_unknown": False,
         "required_surfaces": [],
         "mappings": [],
+        "run_checks": False,
+        "checks": [],
+        "stale_after_days": 90,
+        "state": ".careful/assessment-state.json",
     }
     if not path.exists():
         return result
@@ -141,23 +148,23 @@ def load_project_assessment_config(path: Path) -> dict[str, Any]:
             key, value = scalar
             key = key.strip()
             active_list = None
-            if key in {"ledger", "fail_on_unknown"}:
+            if key in {"ledger", "fail_on_unknown", "run_checks", "stale_after_days", "state"}:
                 result[key] = _parse_scalar(value)
-            elif key in {"required_surfaces", "mappings"}:
+            elif key in {"required_surfaces", "mappings", "checks"}:
                 active_list = key
             continue
         if active_list == "required_surfaces" and raw_line.startswith("    - "):
             result["required_surfaces"].append(raw_line[6:].strip())
             continue
-        if active_list == "mappings" and raw_line.startswith("    - "):
+        if active_list in {"mappings", "checks"} and raw_line.startswith("    - "):
             current_mapping = {}
-            result["mappings"].append(current_mapping)
+            result[active_list].append(current_mapping)
             item = raw_line[6:].strip()
             if ":" in item:
                 key, value = item.split(":", 1)
                 current_mapping[key.strip()] = _parse_scalar(value)
             continue
-        if active_list == "mappings" and raw_line.startswith("      ") and current_mapping is not None:
+        if active_list in {"mappings", "checks"} and raw_line.startswith("      ") and current_mapping is not None:
             if ":" in raw_line:
                 key, value = raw_line.strip().split(":", 1)
                 current_mapping[key.strip()] = _parse_scalar(value)
@@ -197,7 +204,11 @@ def validate_evidence_ledger(root: Path, ledger_path: Path | None = None) -> dic
     if not path.is_absolute():
         path = root / path
     try:
-        if ".careful" in path.parts:
+        root_resolved = root.resolve()
+        path_resolved = path.resolve(strict=False)
+        if root_resolved != path_resolved and root_resolved not in path_resolved.parents:
+            return {"status": "fail", "records": [], "errors": ["ledger must remain inside project root"], "warnings": []}
+        if ".careful" in path_resolved.relative_to(root_resolved).parts:
             return {"status": "fail", "records": [], "errors": ["ledger must not be under .careful/"], "warnings": []}
         records = parse_evidence_ledger(path)
     except FileNotFoundError:
@@ -225,8 +236,14 @@ def validate_evidence_ledger(root: Path, ledger_path: Path | None = None) -> dic
         for evidence in record.evidence:
             if evidence.kind not in EVIDENCE_KINDS:
                 errors.append(f"{prefix} unsupported evidence kind: {evidence.kind}")
-            if not evidence.ref or ".careful" in Path(evidence.ref).parts:
+            if not evidence.ref:
                 errors.append(f"{prefix} evidence reference is empty or private")
+            elif evidence.kind in {"path", "fixture", "test"}:
+                reference = (root / evidence.ref).resolve(strict=False)
+                if root_resolved != reference and root_resolved not in reference.parents:
+                    errors.append(f"{prefix} evidence reference is outside project root")
+                elif ".careful" in reference.relative_to(root_resolved).parts:
+                    errors.append(f"{prefix} evidence reference is empty or private")
     return {
         "status": "fail" if errors else "pass",
         "records": [record.to_dict() for record in records],
@@ -244,12 +261,28 @@ def collect_changed_paths(root: Path, diff_file: Path | None = None) -> tuple[li
         except OSError as exc:
             return [], [f"diff input unavailable: {exc}"]
     try:
-        completed = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD"], cwd=root, text=True, capture_output=True, check=True
+        diff = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD"], cwd=root, text=True, capture_output=True, check=False
         )
-    except (OSError, subprocess.CalledProcessError) as exc:
+        if diff.returncode != 0 and "not a git repository" in diff.stderr.lower():
+            return [], [f"repository diff unavailable: {diff.stderr.strip()}"]
+        status = subprocess.run(
+            ["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=root, text=True, capture_output=True, check=False
+        )
+        if status.returncode != 0:
+            return [], [f"repository diff unavailable: {status.stderr.strip()}"]
+    except OSError as exc:
         return [], [f"repository diff unavailable: {exc}"]
-    return sorted(set(line.strip() for line in completed.stdout.splitlines() if line.strip())), []
+    paths = {line.strip() for line in diff.stdout.splitlines() if line.strip()}
+    for line in status.stdout.splitlines():
+        if len(line) < 4:
+            continue
+        path = line[3:].strip()
+        if " -> " in path:
+            path = path.rsplit(" -> ", 1)[1]
+        if path:
+            paths.add(path)
+    return sorted(paths), []
 
 
 def _mapping(surface: str, classification: str, paths: Iterable[str], source: str, required: bool, summary: str) -> ImpactFinding:
@@ -268,28 +301,39 @@ def analyze_change_impact(root: Path, changed_paths: Sequence[str]) -> dict[str,
         if matched and surface:
             findings.append(_mapping(surface, "verified", matched, "careful.project.yaml assessment.mappings", bool(mapping.get("required")), "explicit project mapping"))
 
-    rules: list[tuple[str, str, str, bool, str]] = [
-        ("openspec/", "durable-specification", "OpenSpec path convention", True, "OpenSpec capability or change may be affected"),
-        ("docs/superpowers/plans/", "execution-plan", "configured execution-plan convention", False, "execution plan may need linking"),
-        ("plugins/careful/", "codex-adapter", "core adapter manifest distribution", True, "Codex distribution may be affected"),
-        ("adapters/claude-code/", "claude-code-adapter", "core adapter manifest distribution", True, "Claude Code distribution may be affected"),
-        ("adapters/factory-droid/", "factory-droid-adapter", "core adapter manifest distribution", True, "Factory Droid distribution may be affected"),
-        ("fixtures/adopted-project/", "consumer-fixture", "self-hosting fixture convention", True, "consumer evidence may need updating"),
-        ("README.md", "public-documentation", "configured README orientation", True, "public orientation may be affected"),
-        ("docs/", "documentation", "documentation path convention", False, "documentation may be affected"),
+    manifest_distributions: list[tuple[str, str]] = []
+    manifest = root / "core" / "adapter-manifest.yaml"
+    if manifest.exists():
+        current_adapter: str | None = None
+        for line in manifest.read_text().splitlines():
+            if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+                current_adapter = line.strip().removesuffix(":")
+            elif current_adapter and line.strip().startswith("distribution:"):
+                manifest_distributions.append((line.split(":", 1)[1].strip(), current_adapter))
+    authority_openspec = "spec_authority: openspec" in (root / "careful.project.yaml").read_text() if (root / "careful.project.yaml").exists() else False
+    rules: list[tuple[str, str, str, bool, str, str]] = [
+        ("openspec/", "durable-specification", "careful.project.yaml documentation.spec_authority", True, "OpenSpec capability or change may be affected", "verified" if authority_openspec else "inferred"),
+        ("docs/superpowers/plans/", "execution-plan", "configured execution-plan convention", False, "execution plan may need linking", "verified"),
+        ("fixtures/adopted-project/", "consumer-fixture", "self-hosting fixture convention", True, "consumer evidence may need updating", "verified"),
+        ("README.md", "public-documentation", "configured README orientation", True, "public orientation may be affected", "verified"),
+        ("docs/", "documentation", "documentation path convention", False, "documentation may be affected", "inferred"),
     ]
-    for prefix, surface, source, required, summary in rules:
+    for distribution, adapter in manifest_distributions:
+        rules.append((distribution, f"{adapter}-adapter", f"core/adapter-manifest.yaml supported_adapters.{adapter}.distribution", True, f"{adapter} distribution may be affected", "verified"))
+    for prefix, surface, source, required, summary, classification in rules:
         matched = [path for path in paths if path == prefix or path.startswith(prefix)]
         if matched:
-            findings.append(_mapping(surface, "verified", matched, source, required, summary))
+            findings.append(_mapping(surface, classification, matched, source, required, summary))
     found_surfaces = {finding.surface for finding in findings}
     if paths:
         for surface in config.get("required_surfaces", []):
             surface = str(surface)
             if surface not in found_surfaces:
                 findings.append(_mapping(surface, "unknown", [], "careful.project.yaml assessment.required_surfaces", True, "required surface has no detected impact mapping"))
-    if any(path.endswith((".md", ".yaml", ".yml")) for path in paths) and not findings:
-        findings.append(_mapping("unknown", "unknown", paths, "no reliable mapping", False, "changed content needs owner or project mapping"))
+    covered_paths = {path for finding in findings for path in finding.paths}
+    unmatched = sorted(set(paths) - covered_paths)
+    if unmatched:
+        findings.append(_mapping("unknown", "unknown", unmatched, "no reliable mapping", bool(config.get("fail_on_unknown")), "changed content needs owner or project mapping"))
 
     unique: dict[tuple[str, tuple[str, ...]], ImpactFinding] = {}
     for finding in findings:
@@ -303,14 +347,44 @@ def analyze_change_impact(root: Path, changed_paths: Sequence[str]) -> dict[str,
     }
 
 
-def assess_findings(ledger_result: dict[str, Any], impact_result: dict[str, Any], depth: str) -> dict[str, Any]:
+def assess_findings(
+    ledger_result: dict[str, Any],
+    impact_result: dict[str, Any],
+    depth: str,
+    config: dict[str, Any] | None = None,
+    checks: Sequence[dict[str, Any]] | None = None,
+    hygiene: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Turn raw ledger and impact output into workflow actions and user flags."""
     findings: list[AssessmentFinding] = []
+    config = config or {}
+    cutoff = date.today() - timedelta(days=int(config.get("stale_after_days", 90)))
+    claim_revisions: dict[tuple[str, str], set[str]] = {}
+    for item in ledger_result.get("records", []):
+        key = (str(item.get("claim", "")), json.dumps(item.get("scope", {}), sort_keys=True))
+        revisions = {str(ref.get("source_revision")) for ref in item.get("evidence", []) if ref.get("source_revision")}
+        if revisions:
+            claim_revisions.setdefault(key, set()).update(revisions)
     if ledger_result.get("status") == "fail":
         findings.append(AssessmentFinding("ledger-validation", "needs-verification", True, "Evidence ledger validation failed.", "Consequential claims cannot be trusted.", ["repair the ledger", "remove the configured ledger and continue without it"], "Resolve ledger validation errors.", "evidence-ledger"))
+    if impact_result.get("errors"):
+        findings.append(AssessmentFinding("impact-input", "user-decision-needed", True, "Impact analysis input is unavailable or degraded.", "The assessment is not exhaustive.", ["provide a reliable diff or host capability", "accept the degraded assessment explicitly"], "Resolve the unavailable impact input.", "change-impact-analysis"))
     for item in ledger_result.get("records", []):
         status = str(item.get("status", "current"))
         classification = str(item.get("classification", "Unknown"))
+        observed_dates = []
+        for evidence in item.get("evidence", []):
+            observed = evidence.get("observed")
+            if observed:
+                try:
+                    observed_dates.append(date.fromisoformat(str(observed)))
+                except ValueError:
+                    pass
+        if observed_dates and min(observed_dates) < cutoff:
+            status = "stale"
+        key = (str(item.get("claim", "")), json.dumps(item.get("scope", {}), sort_keys=True))
+        if len(claim_revisions.get(key, set())) > 1:
+            status = "contradiction"
         if status in {"stale", "contradiction", "accepted-risk"}:
             state = status
         elif classification in {"Unknown", "Assumption"}:
@@ -330,15 +404,29 @@ def assess_findings(ledger_result: dict[str, Any], impact_result: dict[str, Any]
         surface = str(item["surface"])
         required = bool(item.get("required"))
         unknown = item.get("classification") == "unknown"
-        material = required or unknown
-        state = "user-decision-needed" if unknown and material else ("needs-verification" if material else "satisfied")
+        unknown_requires_action = unknown and (required or bool(config.get("fail_on_unknown")))
+        material = required or unknown_requires_action
+        passed = any(check.get("surface") == surface and check.get("status") == "passed" for check in (checks or []))
+        state = "satisfied" if passed else ("user-decision-needed" if unknown_requires_action else ("needs-verification" if material else "satisfied"))
+        path_digest = hashlib.sha1("\n".join(item.get("paths", [])).encode()).hexdigest()[:8]
         findings.append(AssessmentFinding(
-            id=f"impact:{surface}", state=state, material=material,
+            id=f"impact:{surface}:{path_digest}", state=state, material=material,
             summary=str(item.get("summary", surface)),
             consequence="Required follow-up is not yet evidenced." if material else "No material follow-up required.",
             recommended_options=["run the affected check", "record an evidence-backed no-impact result"] if material else [],
             unblock="Complete or explicitly resolve the affected surface." if material else "",
             source=str(item.get("source", "impact analysis")),
+        ))
+    for item in (hygiene or {}).get("findings", []):
+        if str(item.get("severity", "minor")) not in {"important", "critical"}:
+            continue
+        finding_id = f"hygiene:{item.get('category', 'finding')}:{item.get('path', 'unknown')}"
+        findings.append(AssessmentFinding(
+            id=finding_id, state="needs-verification", material=True,
+            summary=f"Structural hygiene finding at {item.get('path', 'unknown')}.",
+            consequence=str(item.get("message", "Independent review is required.")),
+            recommended_options=["correct the finding", "accept the residual risk explicitly"],
+            unblock="Resolve or explicitly review the hygiene finding.", source="codebase-hygiene",
         ))
     if depth == "quick":
         findings = [finding for finding in findings if finding.material]
@@ -368,6 +456,27 @@ def prioritize_user_flags(findings: Sequence[AssessmentFinding]) -> list[dict[st
     return [finding.to_dict() for finding in selected]
 
 
+def run_configured_checks(root: Path, config: dict[str, Any]) -> list[dict[str, Any]]:
+    """Run explicitly enabled project checks without shell evaluation."""
+    if not config.get("run_checks"):
+        return []
+    results = []
+    for item in config.get("checks", []):
+        surface = str(item.get("surface", ""))
+        command = str(item.get("command", ""))
+        if not surface or not command:
+            results.append({"surface": surface, "command": command, "status": "invalid"})
+            continue
+        try:
+            completed = subprocess.run(
+                shlex.split(command), cwd=root, text=True, capture_output=True, check=False, timeout=120
+            )
+            results.append({"surface": surface, "command": command, "status": "passed" if completed.returncode == 0 else "failed", "exit_code": completed.returncode, "output": (completed.stdout + completed.stderr)[-4000:]})
+        except (OSError, subprocess.SubprocessError) as exc:
+            results.append({"surface": surface, "command": command, "status": "unavailable", "output": str(exc)})
+    return sorted(results, key=lambda item: (item["surface"], item["command"]))
+
+
 def run_assessment(root: Path, depth: str, changed_paths: Sequence[str] | None = None) -> dict[str, Any]:
     config = load_project_assessment_config(root / "careful.project.yaml")
     ledger_result = validate_evidence_ledger(root)
@@ -383,9 +492,24 @@ def run_assessment(root: Path, depth: str, changed_paths: Sequence[str] | None =
     except ImportError:
         from review_codebase_hygiene import review_codebase_hygiene
     hygiene_result = review_codebase_hygiene(root)
-    result = assess_findings(ledger_result, impact_result, depth)
+    checks = run_configured_checks(root, config)
+    result = assess_findings(ledger_result, impact_result, depth, config, checks, hygiene_result)
     result["ledger"] = ledger_result
     result["impact"] = impact_result
     result["hygiene"] = hygiene_result
     result["config"] = config
+    result["checks"] = checks
+    state_path = Path(str(config.get("state", ".careful/assessment-state.json")))
+    if not state_path.is_absolute():
+        state_path = root / state_path
+    try:
+        state_resolved = state_path.resolve(strict=False)
+        root_resolved = root.resolve()
+        if root_resolved == state_resolved or root_resolved in state_resolved.parents:
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps({"depth": depth, "route": result["route"], "findings": result["findings"], "user_flags": result["user_flags"], "checks": checks}, indent=2, sort_keys=True) + "\n")
+        else:
+            result.setdefault("warnings", []).append("assessment state path is outside project root and was not written")
+    except OSError as exc:
+        result.setdefault("warnings", []).append(f"assessment state unavailable: {exc}")
     return result

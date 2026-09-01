@@ -22,6 +22,11 @@ class CarefulAssessmentTests(unittest.TestCase):
                 "assessment:\n"
                 "  ledger: evidence/ledger.json\n"
                 "  fail_on_unknown: true\n"
+                "  run_checks: true\n"
+                "  state: .careful/assessment-state.json\n"
+                "  checks:\n"
+                "    - surface: public-documentation\n"
+                "      command: python3 check.py\n"
                 "  required_surfaces:\n"
                 "    - public-documentation\n"
             )
@@ -30,6 +35,8 @@ class CarefulAssessmentTests(unittest.TestCase):
 
         self.assertEqual(result["ledger"], "evidence/ledger.json")
         self.assertTrue(result["fail_on_unknown"])
+        self.assertTrue(result["run_checks"])
+        self.assertEqual(result["checks"], [{"surface": "public-documentation", "command": "python3 check.py"}])
         self.assertEqual(result["required_surfaces"], ["public-documentation"])
 
     def test_selects_actionable_assessment_states(self):

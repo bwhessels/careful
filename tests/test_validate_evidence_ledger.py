@@ -85,6 +85,21 @@ class EvidenceLedgerTests(unittest.TestCase):
         self.assertEqual(result["status"], "pass")
         self.assertEqual(result["warnings"], ["ledger is not configured"])
 
+    def test_rejects_ledger_outside_project_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outside = Path(directory).parent / (root.name + "-outside.json")
+            outside.write_text(json.dumps({"records": []}))
+            (root / "careful.project.yaml").write_text(
+                "assessment:\n  ledger: ../" + outside.name + "\n"
+            )
+
+            result = validate_evidence_ledger(root)
+            outside.unlink()
+
+        self.assertEqual(result["status"], "fail")
+        self.assertIn("ledger must remain inside project root", result["errors"])
+
 
 if __name__ == "__main__":
     unittest.main()

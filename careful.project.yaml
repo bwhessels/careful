@@ -48,6 +48,15 @@ public_readiness:
 assessment:
   ledger: evidence/ledger.json
   fail_on_unknown: false
+  run_checks: true
+  stale_after_days: 90
+  checks:
+    - surface: durable-specification
+      command: openspec validate --specs
+    - surface: public-documentation
+      command: python3 scripts/validate_public_readiness.py
+    - surface: codex-adapter
+      command: python3 scripts/validate_self_hosting.py
   required_surfaces:
     - durable-specification
     - public-documentation

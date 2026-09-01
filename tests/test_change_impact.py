@@ -3,6 +3,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+import subprocess
 
 from scripts.careful_assessment import analyze_change_impact, collect_changed_paths
 
@@ -13,6 +14,11 @@ class ChangeImpactTests(unittest.TestCase):
         self.addCleanup(directory.cleanup)
         root = Path(directory.name)
         (root / "careful.project.yaml").write_text("version: 1\nproject:\n  name: fixture\n" + assessment)
+        (root / "core").mkdir()
+        (root / "core/adapter-manifest.yaml").write_text(
+            "version: 1\ncore_policy: core/policy.md\nsupported_adapters:\n"
+            "  codex:\n    distribution: plugins/careful/\n"
+        )
         return root
 
     def test_maps_canonical_surfaces_as_verified(self):
@@ -51,8 +57,7 @@ class ChangeImpactTests(unittest.TestCase):
         root = self.project()
 
         result = analyze_change_impact(root, ["src/unknown.txt"])
-
-        self.assertEqual(result["findings"], [])
+        self.assertEqual(result["findings"][0]["classification"], "unknown")
         result = analyze_change_impact(root, ["src/unknown.yaml"])
         self.assertEqual(result["findings"][0]["classification"], "unknown")
 
@@ -76,6 +81,24 @@ class ChangeImpactTests(unittest.TestCase):
         result = analyze_change_impact(root, [])
 
         self.assertEqual(result["findings"], [])
+
+    def test_collects_untracked_paths_from_git_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "new.py").write_text("print('new')\n")
+
+            changed, errors = collect_changed_paths(root)
+
+        self.assertEqual(changed, ["new.py"])
+        self.assertEqual(errors, [])
+
+    def test_unmapped_source_files_are_unknown(self):
+        root = self.project()
+
+        result = analyze_change_impact(root, ["src/internal.py"])
+
+        self.assertEqual(result["findings"][0]["classification"], "unknown")
 
 
 if __name__ == "__main__":

@@ -103,6 +103,13 @@ Careful SHALL assess impact findings and use their outcomes to add verification 
 - **THEN** Careful retains the finding in task evidence
 - **AND** it continues without requiring user review.
 
+#### Scenario: Configured check satisfies an affected surface
+
+- **GIVEN** the project explicitly enables a check for an affected surface
+- **WHEN** Careful executes that check successfully
+- **THEN** the matching material impact finding is marked `satisfied`
+- **AND** Careful retains the command result as assessment evidence without asking the user to repeat the check.
+
 ### Requirement: Material unresolved findings are flagged to the user
 
 Careful SHALL prioritize and flag findings that require project-owner judgment, authorization, external evidence, or acceptance of material residual risk. The flag SHALL state the finding, evidence, consequence, recommended options, and unblock action.

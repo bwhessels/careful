@@ -37,6 +37,9 @@ public_readiness:
 assessment:
   ledger: evidence/ledger.json
   fail_on_unknown: false
+  run_checks: false
+  state: .careful/assessment-state.json
+  stale_after_days: 90
   required_surfaces:
     - durable-specification
     - public-documentation
