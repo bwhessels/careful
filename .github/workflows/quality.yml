@@ -29,7 +29,7 @@ jobs:
           node-version: "22"
 
       - name: Install pinned OpenSpec CLI
-        run: npm install --global openspec@1.6.0
+        run: npm install --global @fission-ai/openspec@1.6.0
 
       - name: Run unit tests
         run: python3 -m unittest discover -s tests -v
