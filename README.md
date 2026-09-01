@@ -1,6 +1,6 @@
 # Careful
 
-![A pixel-art lantern illuminating a careful path at night](docs/assets/careful-lantern.png)
+![Pixel-art Careful wordmark with a lantern illuminating a careful path at night](docs/assets/careful-lantern-wordmark.png)
 
 An evidence-led, multi-harness workflow for exploration, implementation, review, documentation, and learning.
 
